@@ -1,6 +1,16 @@
 {% extends "blog/base.html" %}
-{% load static %}
 {% block content %}
+    <div class="content-section media">
+        <img class="rounded-circle account-img" src="{{ author.profile.image.url }}">
+        <div class="media-body">
+            <h2 class="account-heading">{{ author.username }}</h2>
+            <p class="text-secondary">{{ author.email }}</p>
+            {% if author == user %}
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'profile' %}">Update</a>
+            {% endif %}
+        </div>
+    </div>
+    <h3 class="mb-3">Posts by {{ view.kwargs.username }} ({{ page_obj.paginator.count }})</h3>
     {% include "blog/subtemplates/pagination.html" %}
     {% for post in posts %}
         <article class="media content-section">
@@ -11,7 +21,6 @@
                 <div class="article-metadata">
                     <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
                     <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
-                    <!-- a remplacer avec étoile --><button class="btn btn-sm {% if user.profile in post.profile_set.all %}btn-warning{% else %}btn-danger{% endif %}">Fav</button>
                 </div>
                 <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
                 <p class="article-content">{{ post.content }}</p>

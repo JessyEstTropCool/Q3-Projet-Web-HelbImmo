@@ -78,7 +78,24 @@ body {
     margin-right: 20px;
     margin-bottom: 16px;
   }
+
+  .text-img
+  {
+    max-height: 1.5em;
+    width:auto;
+    align-self: baseline;
+  }
+
+  .text-orange
+  {
+    color:orangered;
+  }
   
   .account-heading {
     font-size: 2.5rem;
+  }
+
+  .flex-grow
+  {
+    flex-grow: 1;
   }

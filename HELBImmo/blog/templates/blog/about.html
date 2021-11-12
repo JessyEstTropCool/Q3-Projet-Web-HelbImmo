@@ -1,4 +1,16 @@
 {% extends "blog/base.html" %}
+{% load static %}
 {% block content %}
-    <h1>About Page!</h1>
+    <div class="content-section">
+        <h1 class="article-metadata">Projet HELBImmo</h1>
+        Dans le cadre du cours de Programmation Web II, nous avons été 
+        amenés à faire comme projet de fin d’année, un site d’immobilier, 
+        créativement dénommé HELBImmo.
+        <br><br>
+        Ce site a été conçu sur base du 
+        <a href="https://www.youtube.com/playlist?list=PL-osiE80TeTtoQCKZ03TU5fNfx2UY6U4p">
+            django proposé par Corey Schafer sur YouTube.
+        </a>
+        <img class="d-block mx-auto my-2" src="{% static 'blog/HELB_Logo.png' %}" alt="HELB Logo">
+    </div>
 {% endblock content %}
