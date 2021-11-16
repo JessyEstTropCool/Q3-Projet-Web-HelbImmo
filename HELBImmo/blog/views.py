@@ -8,6 +8,7 @@ from django.views.generic import (
     UpdateView,
     DeleteView
     )
+from django.http import JsonResponse
 from .models import Post
 
 """def home(request):
@@ -15,6 +16,9 @@ from .models import Post
         'posts': Post.objects.all()
     }
     return render(request, 'blog/home.html', context)"""
+
+def add_favorite(request):
+    return JsonResponse({'ok': 'ok'})
 
 class PostListView(ListView):
     model = Post
