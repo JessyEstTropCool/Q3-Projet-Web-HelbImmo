@@ -1,2 +1,3 @@
 @echo off
-start cmd /k "start Environement/helbimmo_env/scripts/activate & cd helbimmo & python manage.py runserver"
+cd environement/helbimmo_env/scripts
+start activate.bat
