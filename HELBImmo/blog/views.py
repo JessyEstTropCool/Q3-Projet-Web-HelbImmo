@@ -18,7 +18,21 @@ from .models import Post
     return render(request, 'blog/home.html', context)"""
 
 def add_favorite(request):
-    return JsonResponse({'ok': 'ok'})
+    if request.user.is_authenticated:
+        user = request.user
+        post = Post.objects.filter(pk=request.GET.get('postid', None)).first()
+        data = {
+            'added': True
+        }
+
+        if ( user.profile in post.profile_set.all() ):
+            data['added'] = False
+            post.profile_set.remove(user.profile)
+        else:
+            post.profile_set.add(user.profile)
+        
+        return JsonResponse(data)
+    return JsonResponse({})
 
 class PostListView(ListView):
     model = Post

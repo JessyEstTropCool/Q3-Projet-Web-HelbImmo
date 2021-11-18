@@ -20,3 +20,10 @@ class Profile(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+
+class Criteria(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    budget = models.DecimalField(max_digits=16, decimal_places=2, default=0)
+    minimum_surface = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    #locality = models.ForeignKey( City)
+    room_amount = models.IntegerField(default=0)

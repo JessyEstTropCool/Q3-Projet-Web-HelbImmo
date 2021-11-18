@@ -87,9 +87,10 @@
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-        crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"></script>
@@ -100,15 +101,23 @@
     <script>
         $(document).ready(function () {
             $(".fav").click(function () {
-                alert("fav!");
+                let btn = $(this);
+                let postid = $(this).data('postid');
+                console.log("fav "+postid+"!");
                 $.ajax({
-                    url: '{% url 'favorite' %}',
+                    url: 'ajax/fav/',
                     data: {
-                        'post': 1
+                        'postid': postid
                     },
-                    dataType: 'json',
-                    success: function (data) {
-                        alert("FAV !!!!!!");
+                    success: function (result) {
+                        if ( result.added === true ) 
+                        {
+                            btn.removeClass("btn-warning").addClass("btn-outline-warning");
+                        }
+                        else
+                        {
+                            btn.removeClass("btn-outline-warning").addClass("btn-warning");
+                        }
                     }
                 });
             });
