@@ -1,6 +1,7 @@
 {% extends "blog/base.html" %}
 {% load static %}
 {% block content %}
+    <h1>Vos Favoris</h1>
 {% include "blog/subtemplates/pagination.html" %}
 {% for post in posts %}
     <article class="media content-section">

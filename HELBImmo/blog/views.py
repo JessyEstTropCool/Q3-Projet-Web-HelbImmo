@@ -30,9 +30,11 @@ def add_favorite(request):
             post.profile_set.remove(user.profile)
         else:
             post.profile_set.add(user.profile)
+
+        data['count'] = post.profile_set.count()
         
         return JsonResponse(data)
-    return JsonResponse({})
+    return JsonResponse({'added': 'no'})
 
 class PostListView(ListView):
     model = Post
@@ -56,6 +58,15 @@ class UserPostListView(ListView):
         context['author'] = User.objects.filter(username=self.kwargs.get('username')).first()
         context['title'] = self.kwargs.get('username')
         return context
+
+class FavoritesListView(ListView):
+    model = Post
+    template_name = 'blog/favorites.html' # <app>/<model>_<viewtype>.html
+    context_object_name = 'posts'
+    paginate_by = 5
+
+    def get_queryset(self):
+        return self.request.user.profile.favorites.all()
 
 class PostDetailView(DetailView):
     model = Post
