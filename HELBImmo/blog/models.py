@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from PIL import Image
 from django.urls import reverse
 
 class Post(models.Model):
@@ -12,6 +13,7 @@ class Post(models.Model):
     livable_surface = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     #locality = models.ForeignKey( City)
     room_amount = models.IntegerField(default=0)
+    thumbnail = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')
     #consultations
 
     def __str__(self):
@@ -19,3 +21,7 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
+
+class GalleryImage(models.Model):
+    post = models.ForeignKey( Post, on_delete=models.CASCADE)
+    image = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')

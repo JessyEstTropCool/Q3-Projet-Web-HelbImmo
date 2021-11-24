@@ -10,6 +10,7 @@ from django.views.generic import (
     )
 from django.http import JsonResponse
 from .models import Post
+from .forms import PostCreateForm, GalleryForm
 
 """def home(request):
     context = {
@@ -73,12 +74,17 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content']
+    #fields = ['title', 'content', 'price']
     success_url = '/'
+    form_class = PostCreateForm
+    other_form_class = GalleryForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
+
+    def post(self, request, *args, **kwargs):
+        cool = 'cool'
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
