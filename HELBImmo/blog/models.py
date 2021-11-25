@@ -14,6 +14,7 @@ class Post(models.Model):
     #locality = models.ForeignKey( City)
     room_amount = models.IntegerField(default=0)
     thumbnail = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')
+    to_sell = models.BooleanField(default=True)
     #consultations
 
     def __str__(self):
@@ -23,5 +24,5 @@ class Post(models.Model):
         return reverse('post-detail', kwargs={'pk': self.pk})
 
 class GalleryImage(models.Model):
-    post = models.ForeignKey( Post, on_delete=models.CASCADE)
+    #post = models.ForeignKey(Post, on_delete=models.CASCADE, default=Post.objects.first() )
     image = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')

@@ -86,6 +86,11 @@ body {
     align-self: baseline;
   }
 
+  .post-img
+  {
+    width:20%;
+  }
+
   .text-orange
   {
     color:orangered;

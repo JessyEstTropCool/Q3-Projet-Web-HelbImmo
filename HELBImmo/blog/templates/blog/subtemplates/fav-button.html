@@ -1,4 +1,4 @@
-<span class="fav ml-2 text-warning" fav-url="{% url 'favorite' %}" data-postid="{{post.id}}">
+<span class="fav text-warning" fav-url="{% url 'favorite' %}" data-postid="{{post.id}}">
     {% if user.profile in post.profile_set.all %}
         <i class="bi bi-star-fill"></i>
     {% else %}
