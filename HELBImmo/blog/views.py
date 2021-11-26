@@ -81,7 +81,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        return super(PostCreateView, self).form_valid(form)
 
     def post(self, request, *args, **kwargs):
         cool = 'cool'
