@@ -1,18 +1,29 @@
-<article class="media content-section">
-    <a href="{% url 'user-posts' post.author.username %}">
-        <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
-    </a>
-    <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
-            <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
-            {% if user.profile in post.profile_set.all %}
-                <i class="fav bi bi-star-fill text-warning ml-2" data-postid="{{post.id}}"></i>
+<article class="content-section">
+    <div class="article-metadata">
+        <a class="mr-2" href="{% url 'user-posts' post.author.username %}">
+            <img class="text-img rounded-circle mr-1" src="{{ post.author.profile.image.url }}">
+            {{ post.author }}
+        </a>
+        <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
+    </div>
+    <div class="media">
+        <div class="post-img mr-2 p-1 border-right">
+            {% if post.to_sell == True %}
+                <h5 class="text-center">A Vendre</h5>
             {% else %}
-                <i class="fav bi bi-star text-warning ml-2" data-postid="{{post.id}}"></i>
+                <h5 class="text-center">A Louer</h5>
             {% endif %}
+            <a href="{% url 'post-detail' post.id %}">
+                <img class="img-fluid rounded m-auto" src="{{ post.thumbnail.url }}">
+            </a>
         </div>
-        <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
-        <p class="article-content">{{ post.content }}</p>
+        <div class="media-body">
+            <h2><a class="article-title font-weight-bold" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+            <div class="d-flex justify-content-between mb-2">
+                {% include "blog/subtemplates/fav-button.html" %}
+                <span class="font-weight-bold">{{ post.price }} €</span>
+            </div>
+            <p class="article-content">{{ post.content }}</p>
+        </div>
     </div>
 </article>

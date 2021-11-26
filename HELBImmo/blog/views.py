@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.generic import (
@@ -74,21 +74,24 @@ class PostDetailView(DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    #fields = ['title', 'content', 'price']
     success_url = '/'
     form_class = PostCreateForm
-    other_form_class = GalleryForm
+    gallery_form_class = GalleryForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super(PostCreateView, self).form_valid(form)
 
-    def post(self, request, *args, **kwargs):
-        cool = 'cool'
+    """def post(self, request, *args, **kwargs):
+        main_form = self.form_class(request.POST)
+        gall_form = self.gallery_form_class(request.POST, prefix='gall_form')
+        print(main_form.errors)
+        return render(request, self.template_name, {'form': main_form, 'gall_form': gall_form})"""
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content']
+    #fields = ['title', 'content']
+    form_class = PostCreateForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user

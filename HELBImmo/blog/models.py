@@ -23,6 +23,17 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
 
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        img = Image.open(self.thumbnail.path)
+        
+        if img.height > 1080 or img.width > 1920:
+            output_size = (1920, 1080)
+            img.thumbnail(output_size)
+
+        img.save(self.thumbnail.path)
+
 class GalleryImage(models.Model):
     #post = models.ForeignKey(Post, on_delete=models.CASCADE, default=Post.objects.first() )
     image = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')

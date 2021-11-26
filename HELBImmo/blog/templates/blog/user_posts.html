@@ -13,20 +13,7 @@
     <h3 class="mb-3">Posts by {{ view.kwargs.username }} ({{ page_obj.paginator.count }})</h3>
     {% include "blog/subtemplates/pagination.html" %}
     {% for post in posts %}
-        <article class="media content-section">
-            <a href="{% url 'user-posts' post.author.username %}">
-                <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
-            </a>
-            <div class="media-body">
-                <div class="article-metadata">
-                    <a class="mr-2" href="{% url 'user-posts' post.author.username %}">{{ post.author }}</a>
-                    <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
-                    {% include "blog/subtemplates/fav-button.html" %}
-                </div>
-                <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
-                <p class="article-content">{{ post.content }}</p>
-            </div>
-        </article>
+        {% include "blog/subtemplates/singlepost.html" with post=post %}
     {% endfor %}
     {% include "blog/subtemplates/pagination.html" %}
 {% endblock content %}

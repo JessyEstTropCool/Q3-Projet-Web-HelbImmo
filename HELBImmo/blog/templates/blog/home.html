@@ -4,35 +4,7 @@
 <h1 class="text-center mb-4">Bienvenue !</h1>
 {% include "blog/subtemplates/pagination.html" %}
 {% for post in posts %}
-    <article class="content-section">
-        <div class="article-metadata">
-            <a class="mr-2" href="{% url 'user-posts' post.author.username %}">
-                <img class="text-img rounded-circle mr-1" src="{{ post.author.profile.image.url }}">
-                {{ post.author }}
-            </a>
-            <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
-        </div>
-        <div class="media">
-            <div class="post-img mr-2 p-1 border-right">
-                {% if post.to_sell == True %}
-                    <h5 class="text-center">A Vendre</h5>
-                {% else %}
-                    <h5 class="text-center">A Louer</h5>
-                {% endif %}
-                <a href="{% url 'post-detail' post.id %}">
-                    <img class="img-fluid rounded" src="{{ post.thumbnail.url }}">
-                </a>
-            </div>
-            <div class="media-body">
-                <h2><a class="article-title" href="{% url 'post-detail' post.id %}"><b>{{ post.title }}</b></a></h2>
-                <div class="d-flex justify-content-between mb-2">
-                    {% include "blog/subtemplates/fav-button.html" %}
-                    <b>{{ post.price }} €</b>
-                </div>
-                <p class="article-content">{{ post.content }}</p>
-            </div>
-        </div>
-    </article>
+    {% include "blog/subtemplates/singlepost.html" with post=post %}
 {% endfor %}
 {% include "blog/subtemplates/pagination.html" %}
 {% endblock content %}
