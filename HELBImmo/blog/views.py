@@ -9,8 +9,9 @@ from django.views.generic import (
     DeleteView
     )
 from django.http import JsonResponse
-from .models import Post
+from .models import Post, PostConsult
 from .forms import PostCreateForm, GalleryForm
+import datetime
 
 """def home(request):
     context = {
@@ -36,6 +37,15 @@ def add_favorite(request):
         
         return JsonResponse(data)
     return JsonResponse({'added': 'no'})
+
+def post_consulted(request):
+    view = PostConsult(post=Post.objects.filter(pk=request.GET.get('postid', None)).first())
+
+    view.save()
+    
+    data = { 'good': view.__str__() }
+
+    return JsonResponse(data)
 
 class PostListView(ListView):
     model = Post
@@ -71,6 +81,49 @@ class FavoritesListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
+
+class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Post
+    template_name = 'blog/post_stats.html'
+    context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super(PostStatsView, self).get_context_data(**kwargs)
+
+        post = Post.objects.filter(pk=self.kwargs.get('pk')).first()
+        numConsults = {}
+        dateConsult = datetime.date.today() - datetime.timedelta(29)
+        max = 0
+        graphMax = 5
+
+        context['dateStart'] = dateConsult
+        context['dateEnd'] = datetime.date.today()
+
+        for i in range(30):
+            numConsults[dateConsult] = PostConsult.objects.filter(date=dateConsult, post=post).count()
+            
+            if numConsults[dateConsult] > max:
+                max = numConsults[dateConsult]
+
+                while max > graphMax:
+                    graphMax += 5
+
+            dateConsult += datetime.timedelta(1)
+
+        
+        context['consults'] = PostConsult.objects.filter(post=self.kwargs.get('pk'))
+        context['title'] = "Statistiques de " + post.title
+        context['consultCount'] = numConsults
+        context['graphHeight'] = graphMax
+
+
+        return context
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post

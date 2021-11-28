@@ -104,3 +104,12 @@ body {
   {
     flex-grow: 1;
   }
+
+  .line-height-large
+  {
+    line-height: 2em;
+  }
+
+  .hover-dark:hover{
+    filter: brightness(85%);
+  }

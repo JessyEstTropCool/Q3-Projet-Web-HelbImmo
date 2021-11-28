@@ -106,6 +106,10 @@
 
     <script>
         $(document).ready(function () {
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
+
             $(".fav").click(function () {
                 let btn = $(this);
                 let postid = $(this).data('postid');

@@ -37,3 +37,10 @@ class Post(models.Model):
 class GalleryImage(models.Model):
     #post = models.ForeignKey(Post, on_delete=models.CASCADE, default=Post.objects.first() )
     image = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')
+
+class PostConsult(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    date = models.DateField( default=timezone.now)
+
+    def __str__(self):
+        return self.post.title + " consult"

@@ -1,39 +1,63 @@
 {% extends "blog/base.html" %}
 {% block content %}
-    <article class="content-section">
-        <div class="article-metadata">
-            <h3 class="d-flex justify-content-between mb-2">
-                <span>{{ object.title }}</span>
-                {% if object.to_sell == True %}
-                    <span class="text-center">A Vendre</span>
-                {% else %}
-                    <span class="text-center">A Louer</span>
+<article class="content-section">
+    <input type="hidden" class="js-view" view-url="{% url 'post-consult' %}" data-postid="{{ view.kwargs.pk }}">
+    <div class="article-metadata">
+        <h3 class="d-flex justify-content-between mb-2">
+            <span>{{ object.title }}</span>
+            {% if object.to_sell == True %}
+            <span class="text-center">A Vendre</span>
+            {% else %}
+            <span class="text-center">A Louer</span>
+            {% endif %}
+        </h3>
+    </div>
+    <img class="img-fluid w-100 rounded mb-2" src="{{ object.thumbnail.url }}">
+    <div class="article-metadata">
+        <a class="mr-2" href="{% url 'user-posts' post.author.username %}">
+            <img class="text-img rounded-circle mr-1" src="{{ post.author.profile.image.url }}">
+            {{ post.author }}
+        </a>
+        <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
+    </div>
+    <div>
+        <div class="d-flex justify-content-between mb-2">
+            <span>
+                {% include "blog/subtemplates/fav-button.html" %}
+                {% if object.author == user %}
+                <a class="btn btn-sm btn-info ml-2 py-0" href="{% url 'post-stats' post.id %}"><i class="bi bi-bar-chart-line"></i></a>
                 {% endif %}
-            </h3>
+            </span>
+            <span class="font-weight-bold">{{ object.price }} €</span>
         </div>
-        <img class="img-fluid rounded mb-2" src="{{ object.thumbnail.url }}">
-        <div class="article-metadata">
-            <a class="mr-2" href="{% url 'user-posts' post.author.username %}">
-                <img class="text-img rounded-circle mr-1" src="{{ post.author.profile.image.url }}">
-                {{ post.author }}
-            </a>
-            <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
-        </div>
-            <div>
-                <div class="d-flex justify-content-between mb-2">
-                    {% include "blog/subtemplates/fav-button.html" %}
-                    <span class="font-weight-bold">{{ object.price }} €</span>
-                </div>
-                <ul class="pl-0 mb-2">
-                    <li class="d-flex justify-content-between">Number of rooms : <span>{{ object.room_amount }}</span></li>
-                    <li class="d-flex justify-content-between">Livable surface : <span>{{ object.livable_surface }}</span></li>
-                </ul>
-                Description : 
-                <p class="article-content rounded border p-1">{{ object.content }}</p>
-            </div>
-    </article>
+        <ul class="pl-0 mb-2">
+            <li class="d-flex justify-content-between">Number of rooms : <span>{{ object.room_amount }}</span></li>
+            <li class="d-flex justify-content-between">Livable surface : <span>{{ object.livable_surface }}</span></li>
+        </ul>
+        Description :
+        <p class="article-content rounded border p-1">{{ object.content }}</p>
+    </div>
+</article>
 {% if object.author == user %}
-    <a class="btn btn-secondary mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a>
-    <a class="btn btn-danger mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a>
+<a class="btn btn-secondary mt-1 mb-1" href="{% url 'post-update' object.id %}">Update</a>
+<a class="btn btn-danger mt-1 mb-1" href="{% url 'post-delete' object.id %}">Delete</a>
 {% endif %}
 {% endblock content %}
+{% block scripts %}
+<script>
+
+    $(document).ready(function () {
+        let info = $(".js-view").first();
+        $.ajax({
+            url: info.attr('view-url'),
+            data: {
+                'postid': info.attr('data-postid')
+            },
+            success: function (result) 
+            {
+                console.log(result.good);
+            }
+        }); 
+    });
+</script>
+{% endblock scripts %}

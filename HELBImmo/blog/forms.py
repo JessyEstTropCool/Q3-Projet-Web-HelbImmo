@@ -1,5 +1,6 @@
 from django import forms
-from .models import Post, GalleryImage
+from django.db.models import fields
+from .models import Post, GalleryImage, PostConsult
 
 class PostCreateForm(forms.ModelForm):
     class Meta:
