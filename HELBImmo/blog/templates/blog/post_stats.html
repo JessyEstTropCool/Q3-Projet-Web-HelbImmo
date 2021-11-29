@@ -10,17 +10,17 @@
         </h3>
     </div>
     <div class="d-flex justify-content-between">
-        <div class="flex-grow bg-info text-light text-center line-height-large rounded m-1 p-4">
+        <div class="flex-grow bg-info text-light text-center line-height-large rounded m-1 py-4">
             Views :
             <br>
             {{ consults.count }}
         </div>
-        <div class="flex-grow bg-warning text-light text-center line-height-large rounded m-1 p-4">
+        <div class="flex-grow bg-warning text-light text-center line-height-large rounded m-1 py-4">
             Favorites :
             <br>
             {{ post.profile_set.count }}
         </div>
-        <div class="flex-grow bg-danger text-light text-center line-height-large rounded m-1 p-4">
+        <div class="flex-grow bg-danger text-light text-center line-height-large rounded m-1 py-4">
             Last :
             <br>
             ?
@@ -30,27 +30,10 @@
 <article class="content-section">
     <div class="article-metadata">
         <h3 class="mb-2">
-            Vues sur les 30 derniers jours
+            Vues indiviuelles sur les 30 derniers jours
         </h3>
     </div>
-    <div class="d-flex border border-dark rounded p-1" style="min-height: 200px">
-        <div class="d-flex flex-column-reverse justify-content-between text-center mr-1">
-            <span>0</span>
-            <span>{% widthratio graphHeight 2 1 %}</span>
-            <span>{{ graphHeight }}</span>
-        </div>
-        <div class="d-flex flex-column w-100">
-            <div class="d-flex align-items-end flex-grow border-bottom border-left border-dark w-100">
-                {% for dateConsult, numConsult in consultCount.items %}
-                    <div class="bg-info border flex-grow hover-dark" style="height:{% widthratio numConsult graphHeight 100 %}%" data-toggle="tooltip" data-placement="top" title="{{ numConsult }}"></div>
-                {% endfor %}
-            </div>
-            <div class="d-flex justify-content-between w-100">
-                <span>{{ dateStart }}</span>
-                <span>{{ dateEnd }}</span>
-            </div>
-        </div>
-    </div>
+    {% include "blog/subtemplates/bar-graph.html" with dict=indivConsults max=indivGraphHeight start=dateStart end=dateEnd %}
 </article>
 <article class="content-section">
     <div class="article-metadata">
@@ -58,23 +41,22 @@
             Vues cumulatives sur les 30 derniers jours
         </h3>
     </div>
-    <div class="d-flex border border-dark rounded p-1" style="min-height: 200px">
-        <div class="d-flex flex-column justify-content-between text-center mr-1">
-            <span>{{ graphHeight }}</span>
-            <span>{% widthratio graphHeight 2 1 %}</span>
-            <span>0</span>
-        </div>
-        <div class="d-flex flex-column w-100">
-            <div class="d-flex align-items-end flex-grow border-bottom border-left border-dark w-100">
-                {% for dateConsult, numConsult in consultCount.items %}
-                    <div class="bg-info border flex-grow hover-dark" style="height:{% widthratio numConsult graphHeight 100 %}%" data-toggle="tooltip" data-placement="top" title="{{ numConsult }}"></div>
-                {% endfor %}
-            </div>
-            <div class="d-flex justify-content-between w-100">
-                <span>{{ dateStart }}</span>
-                <span>{{ dateEnd }}</span>
-            </div>
-        </div>
+    {% include "blog/subtemplates/bar-graph.html" with dict=cumulConsults max=cumulGraphHeight start=dateStart end=dateEnd %}
+</article>
+<article class="content-section">
+    <div class="article-metadata">
+        <h3 class="mb-2">
+            Favoris indiviuels sur les 30 derniers jours
+        </h3>
     </div>
+    {% include "blog/subtemplates/bar-graph.html" with dict=indivConsults max=indivGraphHeight start=dateStart end=dateEnd barColor="warning" %}
+</article>
+<article class="content-section">
+    <div class="article-metadata">
+        <h3 class="mb-2">
+            Favoris cumulatifs sur les 30 derniers jours
+        </h3>
+    </div>
+    {% include "blog/subtemplates/bar-graph.html" with dict=cumulConsults max=cumulGraphHeight start=dateStart end=dateEnd barColor="warning" %}
 </article>
 {% endblock content %}

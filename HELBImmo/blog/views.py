@@ -91,30 +91,33 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context = super(PostStatsView, self).get_context_data(**kwargs)
 
         post = Post.objects.filter(pk=self.kwargs.get('pk')).first()
-        numConsults = {}
+        indivConsults = {}
+        cumulConsults = {}
+        indivMax = 0
+        cumulMax = 0
         dateConsult = datetime.date.today() - datetime.timedelta(29)
-        max = 0
-        graphMax = 5
 
         context['dateStart'] = dateConsult
         context['dateEnd'] = datetime.date.today()
 
         for i in range(30):
-            numConsults[dateConsult] = PostConsult.objects.filter(date=dateConsult, post=post).count()
+            indivConsults[dateConsult] = PostConsult.objects.filter(date=dateConsult, post=post).count()
+            cumulConsults[dateConsult] = PostConsult.objects.filter(date__lte=dateConsult, post=post).count()
             
-            if numConsults[dateConsult] > max:
-                max = numConsults[dateConsult]
+            if indivConsults[dateConsult] > indivMax:
+                indivMax = indivConsults[dateConsult]
 
-                while max > graphMax:
-                    graphMax += 5
+            if cumulConsults[dateConsult] > cumulMax:
+                cumulMax = cumulConsults[dateConsult]
 
             dateConsult += datetime.timedelta(1)
-
         
-        context['consults'] = PostConsult.objects.filter(post=self.kwargs.get('pk'))
         context['title'] = "Statistiques de " + post.title
-        context['consultCount'] = numConsults
-        context['graphHeight'] = graphMax
+        context['consults'] = PostConsult.objects.filter(post=self.kwargs.get('pk'))
+        context['indivConsults'] = indivConsults
+        context['cumulConsults'] = cumulConsults
+        context['indivGraphHeight'] = indivMax + 10 - (indivMax % 10)
+        context['cumulGraphHeight'] = cumulMax + 10 - (cumulMax % 10)
 
 
         return context
