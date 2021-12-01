@@ -1,0 +1,10 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block content %}
+<h1>Yo</h1>
+{% include "blog/subtemplates/pagination.html" %}
+{% for post in posts %}
+    {% include "blog/subtemplates/singlepost.html" with post=post %}
+{% endfor %}
+{% include "blog/subtemplates/pagination.html" %}
+{% endblock content %}

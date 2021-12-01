@@ -9,6 +9,7 @@ from django.views.generic import (
     DeleteView
     )
 from django.http import JsonResponse
+from django.db.models import Q
 from .models import Post, PostConsult
 from .forms import PostCreateForm, GalleryForm
 import datetime
@@ -53,6 +54,17 @@ class PostListView(ListView):
     context_object_name = 'posts'
     ordering = ['-date_posted']
     paginate_by = 5
+
+class SearchResultsListView(ListView):
+    model = Post
+    template_name = 'blog/search_results.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        terms = self.request.GET.get('q')
+        return Post.objects.filter(
+            Q(content__icontains=terms) | Q(title__icontains=terms)
+        )
 
 class UserPostListView(ListView):
     model = Post

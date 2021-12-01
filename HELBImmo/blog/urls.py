@@ -7,12 +7,14 @@ from .views import (
     PostDeleteView,
     PostStatsView,
     UserPostListView,
-    FavoritesListView
+    FavoritesListView,
+    SearchResultsListView
     )
 from . import views
 
 urlpatterns = [
     path('', PostListView.as_view(), name='blog-home'),
+    path('search/', SearchResultsListView.as_view(), name='search-results'),
     path('favorites/', FavoritesListView.as_view(), name='user-favorites'),
     path('user/<str:username>', UserPostListView.as_view(), name='user-posts'),
     path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail'),
