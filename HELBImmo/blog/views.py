@@ -59,6 +59,7 @@ class SearchResultsListView(ListView):
     model = Post
     template_name = 'blog/search_results.html'
     context_object_name = 'posts'
+    paginate_by = 5
 
     def get_queryset(self):
         terms = self.request.GET.get('q')
@@ -66,10 +67,23 @@ class SearchResultsListView(ListView):
             Q(content__icontains=terms) | Q(title__icontains=terms)
         )
 
+    def get_context_data(self, **kwargs):
+        context = super(SearchResultsListView, self).get_context_data(**kwargs)
+        url_params = ""
+
+        for key, value in self.request.GET.items():
+            url_params += "&" + key + "=" + value
+
+        context['url_params'] = url_params
+        context['terms'] = self.request.GET.get('q')
+        context['title'] = self.request.GET.get('q')
+        return context
+
 class UserPostListView(ListView):
     model = Post
     template_name = 'blog/user_posts.html' # <app>/<model>_<viewtype>.html
     context_object_name = 'posts'
+    ordering = ['-date_posted']
     paginate_by = 5
 
     def get_queryset(self):

@@ -1,10 +1,42 @@
 {% extends "blog/base.html" %}
 {% load static %}
 {% block content %}
-<h1>Yo</h1>
-{% include "blog/subtemplates/pagination.html" %}
+<h1>Résultats pour : "{{ terms }}"</h1>
+<p class="mb-4">{{ page_obj.paginator.count }} résultat(s)</p>
+{% include "blog/subtemplates/pagination.html" with extra_params=url_params %}
 {% for post in posts %}
     {% include "blog/subtemplates/singlepost.html" with post=post %}
 {% endfor %}
-{% include "blog/subtemplates/pagination.html" %}
+{% include "blog/subtemplates/pagination.html" with extra_params=url_params %}
 {% endblock content %}
+{% block scripts %}
+<script>
+    function insertParam(key, value) {
+        key = encodeURIComponent(key);
+        value = encodeURIComponent(value);
+
+        // kvp looks like ['key1=value1', 'key2=value2', ...]
+        var kvp = document.location.search.substr(1).split('&');
+        let i=0;
+
+        for(; i<kvp.length; i++){
+            if (kvp[i].startsWith(key + '=')) {
+                let pair = kvp[i].split('=');
+                pair[1] = value;
+                kvp[i] = pair.join('=');
+                break;
+            }
+        }
+
+        if(i >= kvp.length){
+            kvp[kvp.length] = [key,value].join('=');
+        }
+
+        // can return this or...
+        let params = kvp.join('&');
+
+        // reload page with new params
+        document.location.search = params;
+    }
+</script>
+{% endblock scripts %}
