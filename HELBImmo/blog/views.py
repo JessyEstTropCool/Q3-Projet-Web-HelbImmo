@@ -10,6 +10,7 @@ from django.views.generic import (
     )
 from django.http import JsonResponse
 from django.db.models import Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from .models import Post, PostConsult
 from .forms import PostCreateForm, GalleryForm
 import datetime
@@ -59,8 +60,26 @@ class SearchResultsListView(ListView):
     model = Post
     template_name = 'blog/search_results.html'
     context_object_name = 'posts'
-    paginate_by = 5
+    ordering = ['-date_posted']
+    #paginate_by = 5
 
+    """def get(self, request):
+
+        paginate_by = request.GET.get('paginate_by', 5)
+        data = self.get_queryset(self)
+
+        paginator = Paginator(data, paginate_by)
+        page = request.GET.get('page')
+
+        try:
+            paginated = paginator.get_page(page)
+        except PageNotAnInteger:
+            paginated = paginator.get_page(1)
+        except EmptyPage:
+            paginated = paginator.page(paginator.num_pages)
+
+        return render(request, self.template_name, {'DataPaginated':paginated, 'paginate_by':paginate_by})
+"""
     def get_queryset(self):
         terms = self.request.GET.get('q')
         return Post.objects.filter(
@@ -72,11 +91,28 @@ class SearchResultsListView(ListView):
         url_params = ""
 
         for key, value in self.request.GET.items():
-            url_params += "&" + key + "=" + value
+            if key != 'page':
+                url_params += key + "=" + value + "&"
 
+        data = context['posts']
+        paginate_by = self.request.GET.get('paginate_by', 5)
+        paginator = Paginator(data, paginate_by)
+        page = self.request.GET.get('page', 1)
+
+        try:
+            page_obj = paginator.get_page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.get_page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        context['is_paginated'] = True
+        context['paginator'] = paginator
+        context['page_obj'] = page_obj
+        context['posts'] = page_obj
         context['url_params'] = url_params
         context['terms'] = self.request.GET.get('q')
-        context['title'] = self.request.GET.get('q')
+        context['title'] = 'Recherche ' + self.request.GET.get('q')
         return context
 
 class UserPostListView(ListView):
