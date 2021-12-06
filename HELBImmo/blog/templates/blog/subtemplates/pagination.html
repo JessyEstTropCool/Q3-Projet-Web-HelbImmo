@@ -1,27 +1,35 @@
-<div class="d-flex flex-row">
-    {% if is_paginated %}
+{% if is_paginated %}
+    <div class="d-flex flex-row mb-1">
+        <span class="btn-sm mr-1">Per page : </span>
+        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="5">5</a>
+        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="10">10</a>
+
+        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="20">20</a>
+        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1" data-key="paginate_by" data-value="40">40</a>
+    </div>
+    <div class="d-flex flex-row mb-4">
         {% if page_obj.has_previous %}
-            <a class="btn btn-outline-dark flex-grow mb-4 mr-1" href="?{{ extra_params }}page=1">&lt;&lt;</a>
-            <a class="btn btn-outline-dark flex-grow mb-4 mr-1" href="?{{ extra_params }}page={{ page_obj.previous_page_number }}">&lt;</a>
+            <a class="js-get btn btn-outline-dark flex-grow mr-1" data-key="page" data-value="1">&lt;&lt;</a>
+            <a class="js-get btn btn-outline-dark flex-grow mr-1" data-key="page" data-value="{{ page_obj.previous_page_number }}">&lt;</a>
         {% else %}
-            <span class="btn btn-outline-secondary disabled flex-grow mb-4 mr-1">&lt;&lt;</span>
-            <span class="btn btn-outline-secondary disabled flex-grow mb-4 mr-1">&lt;</span>
+            <span class="btn btn-outline-secondary disabled flex-grow mr-1">&lt;&lt;</span>
+            <span class="btn btn-outline-secondary disabled flex-grow mr-1">&lt;</span>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
             {% if page_obj.number == num %}
-                <a class="btn btn-dark flex-grow mb-4 mr-1" href="?{{ extra_params }}page={{ num }}">{{ num }}</a>
+                <a class="js-get btn btn-dark flex-grow mr-1" data-key="page" data-value="{{ num }}">{{ num }}</a>
             {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                <a class="btn btn-outline-dark flex-grow mb-4 mr-1" href="?{{ extra_params }}page={{ num }}">{{ num }}</a>
+                <a class="js-get btn btn-outline-dark flex-grow mr-1" data-key="page" data-value="{{ num }}">{{ num }}</a>
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
-            <a class="btn btn-outline-dark flex-grow mb-4 mr-1" href="?{{ extra_params }}page={{ page_obj.next_page_number }}">&gt;</a>
-            <a class="btn btn-outline-dark flex-grow mb-4" href="?{{ extra_params }}page={{ page_obj.paginator.num_pages }}">&gt;&gt;</a>
+            <a class="js-get btn btn-outline-dark flex-grow mr-1" data-key="page" data-value="{{ page_obj.next_page_number }}">&gt;</a>
+            <a class="js-get btn btn-outline-dark flex-grow" data-key="page" data-value="{{ page_obj.paginator.num_pages }}">&gt;&gt;</a>
         {% else %}
-            <span class="btn btn-outline-secondary disabled flex-grow mb-4 mr-1">&gt;</span>
-            <span class="btn btn-outline-secondary disabled flex-grow mb-4">&gt;&gt;</span>
+            <span class="btn btn-outline-secondary disabled flex-grow mr-1">&gt;</span>
+            <span class="btn btn-outline-secondary disabled flex-grow">&gt;&gt;</span>
         {% endif %}
-    {% endif %}
-</div>
+    </div>
+{% endif %}

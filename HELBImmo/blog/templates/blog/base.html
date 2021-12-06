@@ -60,37 +60,38 @@
             </div>
         </nav>
     </header>
-
-    <main role="main" class="container">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="content-section">
-                    <h3>Our Sidebar</h3>
-                    <p class='text-muted'>You can put any information here you'd like.
-                    <ul class="list-group">
-                        {% if user.is_authenticated %}
-                        <li class="list-group-item list-group-item-light">
-                            <a href="{% url 'post-create' %}">New Post</a>
-                        </li>
-                        <li class="list-group-item list-group-item-light">
-                            <a href="{% url 'user-favorites' %}">Your watchlist</a>
-                        </li>
-                        <li class="list-group-item list-group-item-light">
-                            <a href="#">Your Criteria</a>
-                        </li>
-                        <li class="list-group-item list-group-item-light">
-                            <a href="#">Notifications</a>
-                        </li>
-                        {% endif %}
-                        <li class="list-group-item list-group-item-light">Latest Posts</li>
-                        <li class="list-group-item list-group-item-light">Announcements</li>
-                        <li class="list-group-item list-group-item-light">Calendars</li>
-                        <li class="list-group-item list-group-item-light">etc</li>
-                    </ul>
-                    </p>
-                </div>
-            </div>
-            <div class="col-md-8">
+    
+    <div class="d-flex container">
+        <div class="col-md-4">
+            <div class="content-section">
+                <h3>Our Sidebar</h3>
+                <p class='text-muted'>You can put any information here you'd like.
+                <ul class="list-group">
+                    {% if user.is_authenticated %}
+                    <li class="list-group-item list-group-item-light">
+                        <a href="{% url 'post-create' %}">New Post</a>
+                    </li>
+                    <li class="list-group-item list-group-item-light">
+                        <a href="{% url 'user-favorites' %}">Your watchlist</a>
+                    </li>
+                    <li class="list-group-item list-group-item-light">
+                        <a href="#">Your Criteria</a>
+                    </li>
+                    <li class="list-group-item list-group-item-light">
+                        <a href="#">Notifications</a>
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item list-group-item-light">Latest Posts</li>
+                    <li class="list-group-item list-group-item-light">Announcements</li>
+                    <li class="list-group-item list-group-item-light">Calendars</li>
+                    <li class="list-group-item list-group-item-light">etc</li>
+                </ul>
+            </p>
+        </div>
+    </div>
+        <main role="main" class="container flex-grow">
+            
+            <div class="">
                 {% if messages %}
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }}">
@@ -100,9 +101,8 @@
                 {% endif %}
                 {% block content %}{% endblock %}
             </div>
-            
-        </div>
-    </main>
+        </main>
+    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -145,7 +145,47 @@
                     }
                 });
             });
+
+            $('.js-get').each(function(compt, elem) 
+            {
+                let key = elem.getAttribute('data-key');
+                let value = elem.getAttribute('data-value');
+
+                if (key != null && value != null)
+                {
+                    let searchParams = new URLSearchParams(window.location.search);
+                    searchParams.set(key, value);
+
+                    elem.setAttribute('href', '?' + searchParams);
+                }
+            });
+
+            /*for (let elem of document.getElementsByClassName('js-get'))
+            {
+                let key = elem.getAttribute('data-key');
+                let value = elem.getAttribute('data-value');
+
+                if (key != null && value != null) console.log(key + " = " + value);
+            }*/
         });
+    </script>
+
+    <script>
+        /*const queryString = window.location.search;
+        let searchParams = new URLSearchParams(queryString);
+
+        for (let [key, value] of searchParams) {
+            console.log(key + " = " + value);
+        }
+
+        if ( searchParams.has('page') === true )
+        {
+            searchParams.set('page', 69);
+        }
+
+        for (let [key, value] of searchParams) {
+            console.log(key + " = " + value);
+        }*/
     </script>
     {% block scripts %}{% endblock %}
 </body>

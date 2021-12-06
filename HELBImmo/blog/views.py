@@ -15,11 +15,24 @@ from .models import Post, PostConsult
 from .forms import PostCreateForm, GalleryForm
 import datetime
 
-"""def home(request):
-    context = {
-        'posts': Post.objects.all()
-    }
-    return render(request, 'blog/home.html', context)"""
+class PaginatedMixin():
+    def paginate(self, context):
+        data = self.get_queryset()
+        paginate_by = self.request.GET.get('paginate_by', 5)
+        page = self.request.GET.get('page', 1)
+
+        paginator = Paginator(data, paginate_by)
+
+        try:
+            page_obj = paginator.get_page(page)
+        except PageNotAnInteger:
+            page_obj = paginator.get_page(1)
+        except EmptyPage:
+            page_obj = paginator.page(paginator.num_pages)
+
+        context['paginator'] = paginator
+        context['page_obj'] = page_obj
+        context[self.context_object_name] = page_obj
 
 def add_favorite(request):
     if request.user.is_authenticated:
@@ -49,37 +62,25 @@ def post_consulted(request):
 
     return JsonResponse(data)
 
-class PostListView(ListView):
+class PostListView(PaginatedMixin, ListView):
     model = Post
     template_name = 'blog/home.html' # <app>/<model>_<viewtype>.html
     context_object_name = 'posts'
     ordering = ['-date_posted']
     paginate_by = 5
 
-class SearchResultsListView(ListView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.paginate(context)
+        return context
+
+class SearchResultsListView(PaginatedMixin, ListView):
     model = Post
     template_name = 'blog/search_results.html'
     context_object_name = 'posts'
     ordering = ['-date_posted']
-    #paginate_by = 5
+    paginate_by = 5
 
-    """def get(self, request):
-
-        paginate_by = request.GET.get('paginate_by', 5)
-        data = self.get_queryset(self)
-
-        paginator = Paginator(data, paginate_by)
-        page = request.GET.get('page')
-
-        try:
-            paginated = paginator.get_page(page)
-        except PageNotAnInteger:
-            paginated = paginator.get_page(1)
-        except EmptyPage:
-            paginated = paginator.page(paginator.num_pages)
-
-        return render(request, self.template_name, {'DataPaginated':paginated, 'paginate_by':paginate_by})
-"""
     def get_queryset(self):
         terms = self.request.GET.get('q')
         return Post.objects.filter(
@@ -88,34 +89,14 @@ class SearchResultsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(SearchResultsListView, self).get_context_data(**kwargs)
-        url_params = ""
 
-        for key, value in self.request.GET.items():
-            if key != 'page':
-                url_params += key + "=" + value + "&"
+        self.paginate(context)
 
-        data = context['posts']
-        paginate_by = self.request.GET.get('paginate_by', 5)
-        paginator = Paginator(data, paginate_by)
-        page = self.request.GET.get('page', 1)
-
-        try:
-            page_obj = paginator.get_page(page)
-        except PageNotAnInteger:
-            page_obj = paginator.get_page(1)
-        except EmptyPage:
-            page_obj = paginator.page(paginator.num_pages)
-
-        context['is_paginated'] = True
-        context['paginator'] = paginator
-        context['page_obj'] = page_obj
-        context['posts'] = page_obj
-        context['url_params'] = url_params
         context['terms'] = self.request.GET.get('q')
-        context['title'] = 'Recherche ' + self.request.GET.get('q')
+        context['title'] = 'Recherche - ' + self.request.GET.get('q')
         return context
 
-class UserPostListView(ListView):
+class UserPostListView(PaginatedMixin, ListView):
     model = Post
     template_name = 'blog/user_posts.html' # <app>/<model>_<viewtype>.html
     context_object_name = 'posts'
@@ -128,11 +109,14 @@ class UserPostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserPostListView, self).get_context_data(**kwargs)
+
+        self.paginate(context)
+
         context['author'] = User.objects.filter(username=self.kwargs.get('username')).first()
         context['title'] = self.kwargs.get('username')
         return context
 
-class FavoritesListView(ListView):
+class FavoritesListView(PaginatedMixin, ListView):
     model = Post
     template_name = 'blog/favorites.html' # <app>/<model>_<viewtype>.html
     context_object_name = 'posts'
@@ -140,6 +124,15 @@ class FavoritesListView(ListView):
 
     def get_queryset(self):
         return self.request.user.profile.favorites.all()
+
+    def get_context_data(self, **kwargs):
+        context = super(FavoritesListView, self).get_context_data(**kwargs)
+
+        self.paginate(context)
+
+        context['title'] = 'Votre Watchlist'
+
+        return context
 
 class PostDetailView(DetailView):
     model = Post
