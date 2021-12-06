@@ -1,11 +1,13 @@
 {% if is_paginated %}
     <div class="d-flex flex-row mb-1">
         <span class="btn-sm mr-1">Per page : </span>
-        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="5">5</a>
-        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="10">10</a>
-
-        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="20">20</a>
-        <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1" data-key="paginate_by" data-value="40">40</a>
+        {% for num in per_page_values %}
+            {% if page_obj.paginator.per_page == num %}
+                <a class="js-get btn btn-sm btn-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="{{ num }}">{{ num }}</a>
+            {% else %}
+                <a class="js-get btn btn-sm btn-outline-secondary flex-grow mb-1 mr-1" data-key="paginate_by" data-value="{{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endfor %}
     </div>
     <div class="d-flex flex-row mb-4">
         {% if page_obj.has_previous %}

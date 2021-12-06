@@ -160,32 +160,11 @@
                 }
             });
 
-            /*for (let elem of document.getElementsByClassName('js-get'))
+            $('.js-map').each(function(compt, elem) 
             {
-                let key = elem.getAttribute('data-key');
-                let value = elem.getAttribute('data-value');
-
-                if (key != null && value != null) console.log(key + " = " + value);
-            }*/
+                
+            });
         });
-    </script>
-
-    <script>
-        /*const queryString = window.location.search;
-        let searchParams = new URLSearchParams(queryString);
-
-        for (let [key, value] of searchParams) {
-            console.log(key + " = " + value);
-        }
-
-        if ( searchParams.has('page') === true )
-        {
-            searchParams.set('page', 69);
-        }
-
-        for (let [key, value] of searchParams) {
-            console.log(key + " = " + value);
-        }*/
     </script>
     {% block scripts %}{% endblock %}
 </body>

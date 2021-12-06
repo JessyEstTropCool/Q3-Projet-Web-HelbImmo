@@ -30,6 +30,7 @@ class PaginatedMixin():
         except EmptyPage:
             page_obj = paginator.page(paginator.num_pages)
 
+        context['per_page_values'] = [5, 10, 25, 50]
         context['paginator'] = paginator
         context['page_obj'] = page_obj
         context[self.context_object_name] = page_obj
