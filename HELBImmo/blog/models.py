@@ -15,7 +15,8 @@ class Post(models.Model):
     room_amount = models.IntegerField(default=0)
     thumbnail = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')
     to_sell = models.BooleanField(default=True)
-    #consultations
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, default=0)
+    latitude = models.DecimalField(max_digits=8, decimal_places=6, default=0)
 
     def __str__(self):
         return self.title
