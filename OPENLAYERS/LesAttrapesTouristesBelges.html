@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Venez voir nos sites</title>
+    </head>
+    <body>
+        <div id="mapdiv" style="height:50vh; margin-bottom:1em;"></div>
+        <span onclick="focusMap(gpLonLat)"><img src="GrotePlein.jpg"></span>
+        <span onclick="focusMap(aLonLat)"><img src="Atomium.jpg"></span>
+        <span onclick="focusMap(mpLonLat)"><img src="MannekenPis.jpg"></span>
+        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+        <script>
+            map = new OpenLayers.Map("mapdiv");
+            map.addLayer(new OpenLayers.Layer.OSM());
+
+            //alert("Grand Place : "+50.8466+" - "+4.3525+"\nAtomium : "+50.895+" - "+4.341388+"\nManneken Pis : "+50.845+" - "+4.35);
+
+            var gpLonLat = new OpenLayers.LonLat( 4.3525, 50.8466 )
+                .transform(
+                    new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                    map.getProjectionObject() // to Spherical Mercator Projection
+                );
+
+            var aLonLat = new OpenLayers.LonLat( 4.341388, 50.895 )
+                .transform(
+                    new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                    map.getProjectionObject() // to Spherical Mercator Projection
+                );
+
+            var mpLonLat = new OpenLayers.LonLat( 4.35, 50.845 )
+                .transform(
+                    new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                    map.getProjectionObject() // to Spherical Mercator Projection
+                );
+                
+            var zoom=16;
+
+            var markers = new OpenLayers.Layer.Markers( "Markers" );
+            map.addLayer(markers);
+            
+            markers.addMarker(new OpenLayers.Marker(gpLonLat));
+            markers.addMarker(new OpenLayers.Marker(aLonLat));
+            markers.addMarker(new OpenLayers.Marker(mpLonLat));
+            
+            map.setCenter (gpLonLat, zoom);
+
+            function focusMap(lonLat)
+            {
+                //alert(lonLat);
+                map.setCenter (lonLat, zoom);
+            }
+        </script>
+    </body>
+</html>
