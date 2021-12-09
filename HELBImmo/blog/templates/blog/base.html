@@ -93,14 +93,12 @@
             
             <div class="">
                 {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-                {% endfor %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
-                <div id="js-map" class="js-map" style="height: 30vh;"></div>
-                <div id="js-map" class="js-map" style="height: 30vh;"></div>
                 {% block content %}{% endblock %}
             </div>
         </main>
@@ -121,6 +119,7 @@
     <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
 
     <script>
+
         $(document).ready(function () {
             $(function () {
                 $('[data-toggle="tooltip"]').tooltip()
@@ -165,51 +164,27 @@
 
             $('#js-map').each(function(compt, elem) 
             {
+                map = new OpenLayers.Map(elem.id);
+                map.addLayer(new OpenLayers.Layer.OSM());
+
+                //alert(0+" - "+0);
+
+                var lonLat = new OpenLayers.LonLat(  4.3525, 50.8466/*elem.getAttribute('longitude'), elem.getAttribute('latitude') */)
+                    .transform(
+                        new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+                        map.getProjectionObject() // to Spherical Mercator Projection
+                    );
+                    
+                var zoom=16;
+
+                var markers = new OpenLayers.Layer.Markers( "Markers" );
+                map.addLayer(markers);
                 
+                markers.addMarker(new OpenLayers.Marker(lonLat));
+                
+                map.setCenter(lonLat, zoom);
             });
         });
-
-        map = new OpenLayers.Map('js-map');
-        map.addLayer(new OpenLayers.Layer.OSM());
-
-        //alert(0+" - "+0);
-
-        var lonLat = new OpenLayers.LonLat( 0, 0 )
-            .transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-            );
-            
-        var zoom=16;
-
-        var markers = new OpenLayers.Layer.Markers( "Markers" );
-        map.addLayer(markers);
-        
-        markers.addMarker(new OpenLayers.Marker(lonLat));
-        
-        map.setCenter(lonLat, zoom);
-    </script>
-
-    <script>
-        /*map = new OpenLayers.Map("js-map");
-        map.addLayer(new OpenLayers.Layer.OSM());
-
-        //alert(0+" - "+0);
-
-        var lonLat = new OpenLayers.LonLat( 0, 0 )
-            .transform(
-                new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                map.getProjectionObject() // to Spherical Mercator Projection
-            );
-            
-        var zoom=16;
-
-        var markers = new OpenLayers.Layer.Markers( "Markers" );
-        map.addLayer(markers);
-        
-        markers.addMarker(new OpenLayers.Marker(lonLat));
-        
-        map.setCenter (lonLat, zoom);*/
     </script>
     {% block scripts %}{% endblock %}
 </body>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/css/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 80vh;
+            width: 100%;
+        }
+
+        body {
+            height: 500vh;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
+    <title>OpenLayers example</title>
+</head>
+
+<body>
+    <h2>My Map</h2>
+    <div id="map" class="map"></div>
+    <button onclick="yo()">C ou ça</button>
+    <script type="text/javascript">
+        const iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([4.3525, 50.8466])),
+            name: 'Null Island',
+            population: 4000,
+            rainfall: 500,
+        });
+
+        const iconStyle = new ol.style.Style({
+            image: new ol.style.Icon({
+                anchor: [0.5, 1],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+                src: 'apple.png',
+            }),
+        });
+
+        iconFeature.setStyle(iconStyle);
+
+        const vectorSource = new ol.source.Vector({
+            features: [iconFeature],
+        });
+
+        const vectorLayer = new ol.layer.Vector({
+            source: vectorSource,
+        });
+
+        const rasterLayer = new ol.layer.Tile({
+            source: new ol.source.TileJSON({
+                url: 'https://a.tiles.mapbox.com/v3/aj.1x1-degrees.json?secure=1',
+                crossOrigin: '',
+            }),
+        });
+
+        const target = document.getElementById('map');
+
+
+        var map = new ol.Map({
+            target: target,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                vectorLayer
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([4.3525, 50.8466]),
+                zoom: 4
+            })
+        });
+
+        const modify = new ol.interaction.Modify({
+            hitDetection: vectorLayer,
+            source: vectorSource,
+        });
+        modify.on(['modifystart', 'modifyend'], function (evt) {
+            target.style.cursor = evt.type === 'modifystart' ? 'grabbing' : 'pointer';
+        });
+        const overlaySource = modify.getOverlay().getSource();
+        overlaySource.on(['addfeature', 'removefeature'], function (evt) {
+            target.style.cursor = evt.type === 'addfeature' ? 'pointer' : '';
+        });
+
+        map.addInteraction(modify);
+
+        function yo()
+        {
+            alert(ol.proj.toLonLat(iconFeature.getGeometry().getCoordinates(), 'EPSG:3857'));
+        }
+    </script>
+</body>
+
+</html>

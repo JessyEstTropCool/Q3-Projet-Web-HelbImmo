@@ -36,6 +36,7 @@
         </ul>
         Description :
         <p class="article-content rounded border p-1">{{ object.content }}</p>
+        <div tabindex="1" id="js-map" latitude="{{ object.latitude }}" longitude="{{ object.longitude }}" style="height: 30vh;"></div>
     </div>
 </article>
 {% if object.author == user %}
