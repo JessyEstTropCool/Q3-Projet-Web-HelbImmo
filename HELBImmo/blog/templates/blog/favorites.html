@@ -3,8 +3,8 @@
 {% block content %}
     <h1 class="mb-3">Vos Favoris</h1>
 {% include "blog/subtemplates/pagination.html" %}
-{% for post in posts %}
-    {% include "blog/subtemplates/singlepost.html" with post=post %}
+{% for fav in favs %}
+    {% include "blog/subtemplates/singlepost.html" with post=fav.post %}
 {% endfor %}
 {% include "blog/subtemplates/pagination.html" %}
 {% endblock content %}

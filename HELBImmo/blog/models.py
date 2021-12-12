@@ -45,3 +45,11 @@ class PostConsult(models.Model):
 
     def __str__(self):
         return self.post.title + " consult"
+
+class PostFavorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    date = models.DateTimeField( default=timezone.now)
+
+    def __str__(self):
+        return self.user.username + " favorite on " + self.post.title

@@ -10,7 +10,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    
+
     <!-- Bootstrap Icons-->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 
@@ -38,8 +38,20 @@
                         <a class="nav-item nav-link" href="{% url 'blog-about' %}">About</a>
                     </div>
                     <!-- Navbar Right Side -->
-                    <form id="searchform" class="d-flex mr-auto" action="{% url 'search-results' %}" method="get">
-                        <input type="text" class="form-control rounded-right-0" name="q" placeholder="Search for keywords">
+                    <form id="searchform" class="d-flex mr-auto dropdown" action="{% url 'search-results' %}" method="get">
+                        <input type="text" class="form-control rounded-right-0" name="q" value="{{ request.GET.q }}"
+                            placeholder="Search for keywords">
+                        <a class="btn btn-info text-light rounded-0 dropdown-toggle" href="#" role="button"
+                            id="dropdownFiltersLink" data-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false"></a>
+
+                        <div class="dropdown-menu text-center border p-3 m-0 right-0" aria-labelledby="dropdownFiltersLink">
+                            <input type="number" class="form-control" name="budgetMin" value="{{ request.GET.budgetMin }}" min="0" placeholder="Minimum">
+                            <input type="number" class="form-control" name="budgetMax" value="{{ request.GET.budgetMax }}" min="0" placeholder="Maximum">
+                            <div class="dropdown-divider"></div>
+                            <input type="submit" class="btn btn-small btn-info ml-auto" value="Recherche détaillée">
+                        </div>
+
                         <button class="btn btn-info rounded-left-0" form="searchform">
                             <i class="bi bi-search"></i>
                         </button>
@@ -60,7 +72,7 @@
             </div>
         </nav>
     </header>
-    
+
     <div class="d-flex container">
         <div class="col-md-4">
             <div class="content-section">
@@ -86,18 +98,18 @@
                     <li class="list-group-item list-group-item-light">Calendars</li>
                     <li class="list-group-item list-group-item-light">etc</li>
                 </ul>
-            </p>
+                </p>
+            </div>
         </div>
-    </div>
         <main role="main" class="container flex-grow">
-            
+
             <div class="">
                 {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }}">
-                            {{ message }}
-                        </div>
-                    {% endfor %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
                 {% endif %}
                 {% block content %}{% endblock %}
             </div>
@@ -128,33 +140,30 @@
             $(".fav").click(function () {
                 let btn = $(this);
                 let postid = $(this).data('postid');
-                console.log("fav "+postid+"!");
+                console.log("fav " + postid + "!");
                 $.ajax({
                     url: btn.attr('fav-url'),
                     data: {
                         'postid': postid
                     },
                     success: function (result) {
-                        if ( result.added === true ) 
-                        {
+                        if (result.added === true) {
                             btn.children().first().removeClass("bi-star").addClass("bi-star-fill");
+                            btn.children().last().text("Dans les favoris");
                         }
-                        else
-                        {
+                        else {
                             btn.children().first().removeClass("bi-star-fill").addClass("bi-star");
+                            btn.children().last().text("Ajouter aux favoris");
                         }
-                        btn.children().last().text(result.count);
                     }
                 });
             });
 
-            $('.js-get').each(function(compt, elem) 
-            {
+            $('.js-get').each(function (compt, elem) {
                 let key = elem.getAttribute('data-key');
                 let value = elem.getAttribute('data-value');
 
-                if (key != null && value != null)
-                {
+                if (key != null && value != null) {
                     let searchParams = new URLSearchParams(window.location.search);
                     searchParams.set(key, value);
 
@@ -162,27 +171,35 @@
                 }
             });
 
-            $('#js-map').each(function(compt, elem) 
-            {
+            $('#js-map').each(function (compt, elem) {
                 map = new OpenLayers.Map(elem.id);
                 map.addLayer(new OpenLayers.Layer.OSM());
 
                 //alert(0+" - "+0);
 
-                var lonLat = new OpenLayers.LonLat(  4.3525, 50.8466/*elem.getAttribute('longitude'), elem.getAttribute('latitude') */)
+                var lonLat = new OpenLayers.LonLat(4.3525, 50.8466/*elem.getAttribute('longitude'), elem.getAttribute('latitude') */)
                     .transform(
                         new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
                         map.getProjectionObject() // to Spherical Mercator Projection
                     );
-                    
-                var zoom=16;
 
-                var markers = new OpenLayers.Layer.Markers( "Markers" );
+                var zoom = 16;
+
+                var markers = new OpenLayers.Layer.Markers("Markers");
                 map.addLayer(markers);
-                
+
                 markers.addMarker(new OpenLayers.Marker(lonLat));
-                
+
                 map.setCenter(lonLat, zoom);
+            });
+
+            $('#searchform').submit(function () {
+                $(this)
+                    .find('input[name]')
+                    .filter(function () {
+                        return !this.value && this.name != "q";
+                    })
+                    .prop('name', '');
             });
         });
     </script>

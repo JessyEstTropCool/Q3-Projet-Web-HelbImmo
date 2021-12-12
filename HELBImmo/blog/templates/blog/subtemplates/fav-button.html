@@ -1,8 +1,9 @@
-<span class="fav text-warning hover-dark" fav-url="{% url 'favorite' %}" data-postid="{{post.id}}">
-    {% if user.profile in post.profile_set.all %}
+<span class="btn fav text-warning hover-dark p-0" fav-url="{% url 'favorite' %}" data-postid="{{post.id}}">
+    {% if post in user_favs %}
         <i class="bi bi-star-fill"></i>
+        <span>Dans les favoris</span>
     {% else %}
         <i class="bi bi-star"></i>
+        <span>Ajouter aux favoris</span>
     {% endif %}
-    <span>{{ post.profile_set.count }}</span>
 </span>

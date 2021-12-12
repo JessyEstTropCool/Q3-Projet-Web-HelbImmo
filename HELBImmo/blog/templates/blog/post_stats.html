@@ -18,7 +18,7 @@
         <div class="flex-grow bg-warning text-light text-center line-height-large rounded m-1 py-4">
             Favorites :
             <br>
-            {{ post.profile_set.count }}
+            {{ favs.count }}
         </div>
     </div>
 </article>
@@ -28,7 +28,7 @@
             Vues indiviuelles sur les 30 derniers jours
         </h3>
     </div>
-    {% include "blog/subtemplates/bar-graph.html" with dict=indivConsults max=indivGraphHeight start=dateStart end=dateEnd %}
+    {% include "blog/subtemplates/bar-graph.html" with graph=indivConsults include_key='true' %}
 </article>
 <article class="content-section">
     <div class="article-metadata">
@@ -36,7 +36,7 @@
             Vues cumulatives sur les 30 derniers jours
         </h3>
     </div>
-    {% include "blog/subtemplates/bar-graph.html" with dict=cumulConsults max=cumulGraphHeight start=dateStart end=dateEnd %}
+    {% include "blog/subtemplates/bar-graph.html" with graph=cumulConsults include_key='true' %}
 </article>
 <article class="content-section">
     <div class="article-metadata">
@@ -44,7 +44,7 @@
             Favoris indiviuels sur les 30 derniers jours
         </h3>
     </div>
-    {% include "blog/subtemplates/bar-graph.html" with dict=indivConsults max=indivGraphHeight start=dateStart end=dateEnd barColor="warning" %}
+    {% include "blog/subtemplates/bar-graph.html" with graph=indivFavs barColor="warning" include_key='true' %}
 </article>
 <article class="content-section">
     <div class="article-metadata">
@@ -52,6 +52,6 @@
             Favoris cumulatifs sur les 30 derniers jours
         </h3>
     </div>
-    {% include "blog/subtemplates/bar-graph.html" with dict=cumulConsults max=cumulGraphHeight start=dateStart end=dateEnd barColor="warning" %}
+    {% include "blog/subtemplates/bar-graph.html" with graph=cumulFavs barColor="warning" include_key='true' %}
 </article>
 {% endblock content %}

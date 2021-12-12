@@ -6,24 +6,27 @@
         </a>
         <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
     </div>
-    <div class="media">
+    <div class="media align-items-stretch">
         <div class="post-img mr-2 p-1 border-right">
-            {% if post.to_sell == True %}
-                <h5 class="text-center">A Vendre</h5>
-            {% else %}
-                <h5 class="text-center">A Louer</h5>
-            {% endif %}
             <a href="{% url 'post-detail' post.id %}">
                 <img class="img-fluid w-100 rounded m-auto" src="{{ post.thumbnail.url }}">
             </a>
         </div>
-        <div class="media-body">
+        <div class="d-flex flex-column media-body">
             <h2><a class="article-title font-weight-bold" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+            <h6>
+                Chose - 
+                {% if post.to_sell == True %}
+                    A Vendre
+                {% else %}
+                    A Louer
+                {% endif %}
+            </h6>
             <div class="d-flex justify-content-between mb-2">
                 {% include "blog/subtemplates/fav-button.html" %}
-                <span class="font-weight-bold">{{ post.price }} €</span>
+                <span class="font-weight-bold">{{ post.price }} €{% if post.to_sell == False %}/mois{% endif %}</span>
             </div>
-            <p class="article-content">{{ post.content }}</p>
+            <p class="article-content rounded border p-1 flex-grow">{{ post.content }}</p>
         </div>
     </div>
 </article>

@@ -1,18 +1,22 @@
 <div class="d-flex border border rounded p-1" style="min-height: 30vh">
     <div class="d-flex flex-column justify-content-between text-center mr-1 mb-4">
-        <span>{{ max }}</span>
-        <span>{% widthratio max 2 1 %}</span>
+        <span>{{ graph.height }}</span>
+        <span>{% widthratio graph.height 2 1 %}</span>
         <span>0</span>
     </div>
     <div class="d-flex flex-column w-100">
         <div class="d-flex align-items-end flex-grow border-bottom border-left border-dark w-100">
-            {% for key, value in dict.items %}
-                <div class="bg-info bg-{{ barColor }} border border-bottom-0 border-white flex-grow hover-dark rounded-top" style="height:{% widthratio value max 100 %}%" data-toggle="tooltip" data-placement="top" title="{{ value }}"></div>
+            {% for key, value in graph.data.items %}
+                {% if include_key %}
+                    <div class="bg-info bg-{{ barColor }} border border-bottom-0 border-white flex-grow hover-dark rounded-top" style="height:{% widthratio value graph.height 100 %}%" data-toggle="tooltip" data-placement="top" title="{{ key }} - {{ value }}"></div>
+                {% else %}
+                    <div class="bg-info bg-{{ barColor }} border border-bottom-0 border-white flex-grow hover-dark rounded-top" style="height:{% widthratio value graph.height 100 %}%" data-toggle="tooltip" data-placement="top" title="{{ value }}"></div>
+                {% endif %}
             {% endfor %}
         </div>
         <div class="d-flex justify-content-between w-100">
-            <span>{{ start }}</span>
-            <span>{{ end }}</span>
+            <span>{{ graph.start }}</span>
+            <span>{{ graph.end }}</span>
         </div>
     </div>
 </div>

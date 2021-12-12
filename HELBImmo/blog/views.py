@@ -8,10 +8,10 @@ from django.views.generic import (
     UpdateView,
     DeleteView
     )
-from django.http import JsonResponse
+from django.http import JsonResponse, request
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from .models import Post, PostConsult
+from .models import Post, PostConsult, PostFavorite
 from .forms import PostCreateForm, GalleryForm
 import datetime
 
@@ -35,6 +35,12 @@ class PaginatedMixin():
         context['page_obj'] = page_obj
         context[self.context_object_name] = page_obj
 
+class FavoritesMixin():
+    def get_user_favorites(self):
+        favs = PostFavorite.objects.filter(user=self.request.user)
+        return Post.objects.filter(id__in=favs.values('post'))
+
+
 def add_favorite(request):
     if request.user.is_authenticated:
         user = request.user
@@ -43,13 +49,14 @@ def add_favorite(request):
             'added': True
         }
 
-        if ( user.profile in post.profile_set.all() ):
-            data['added'] = False
-            post.profile_set.remove(user.profile)
-        else:
-            post.profile_set.add(user.profile)
+        fav = PostFavorite.objects.filter(user=user, post=post)
 
-        data['count'] = post.profile_set.count()
+        if fav:
+            data['added'] = False
+            fav.delete()
+        else:
+            fav = PostFavorite(user=user, post=post)
+            fav.save()
         
         return JsonResponse(data)
     return JsonResponse({'added': 'no'})
@@ -63,7 +70,7 @@ def post_consulted(request):
 
     return JsonResponse(data)
 
-class PostListView(PaginatedMixin, ListView):
+class PostListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/home.html' # <app>/<model>_<viewtype>.html
     context_object_name = 'posts'
@@ -73,9 +80,10 @@ class PostListView(PaginatedMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         self.paginate(context)
+        context['user_favs'] = self.get_user_favorites()
         return context
 
-class SearchResultsListView(PaginatedMixin, ListView):
+class SearchResultsListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/search_results.html'
     context_object_name = 'posts'
@@ -84,20 +92,29 @@ class SearchResultsListView(PaginatedMixin, ListView):
 
     def get_queryset(self):
         terms = self.request.GET.get('q')
-        return Post.objects.filter(
+        results = Post.objects.filter(
             Q(content__icontains=terms) | Q(title__icontains=terms)
-        )
+        ).order_by('-date_posted')
+
+        if ( self.request.GET.get('budgetMax') ):
+            results = results.filter(price__lte=self.request.GET.get('budgetMax'))
+        if ( self.request.GET.get('budgetMin') ):
+            results = results.filter(price__gte=self.request.GET.get('budgetMin'))
+
+        return results
 
     def get_context_data(self, **kwargs):
         context = super(SearchResultsListView, self).get_context_data(**kwargs)
 
         self.paginate(context)
 
+        context['user_favs'] = self.get_user_favorites()
+
         context['terms'] = self.request.GET.get('q')
         context['title'] = 'Recherche - ' + self.request.GET.get('q')
         return context
 
-class UserPostListView(PaginatedMixin, ListView):
+class UserPostListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/user_posts.html' # <app>/<model>_<viewtype>.html
     context_object_name = 'posts'
@@ -113,30 +130,42 @@ class UserPostListView(PaginatedMixin, ListView):
 
         self.paginate(context)
 
+        context['user_favs'] = self.get_user_favorites()
+
         context['author'] = User.objects.filter(username=self.kwargs.get('username')).first()
         context['title'] = self.kwargs.get('username')
         return context
 
-class FavoritesListView(PaginatedMixin, ListView):
+class FavoritesListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/favorites.html' # <app>/<model>_<viewtype>.html
-    context_object_name = 'posts'
+    context_object_name = 'favs'
     paginate_by = 5
 
     def get_queryset(self):
-        return self.request.user.profile.favorites.all()
+        return PostFavorite.objects.filter(user=self.request.user).order_by('-date')
 
     def get_context_data(self, **kwargs):
         context = super(FavoritesListView, self).get_context_data(**kwargs)
 
         self.paginate(context)
+        
+        context['user_favs'] = self.get_user_favorites()
 
         context['title'] = 'Votre Watchlist'
 
         return context
 
-class PostDetailView(DetailView):
+class PostDetailView(FavoritesMixin, DetailView):
     model = Post
+
+    def get_context_data(self, **kwargs):
+        context = super(PostDetailView, self).get_context_data(**kwargs)
+        
+        context['user_favs'] = self.get_user_favorites()
+        context['title'] = Post.objects.filter(id=self.kwargs.get('pk')).first().title
+
+        return context
 
 class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Post
@@ -146,35 +175,50 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(PostStatsView, self).get_context_data(**kwargs)
 
-        post = Post.objects.filter(pk=self.kwargs.get('pk')).first()
-        indivConsults = {}
-        cumulConsults = {}
-        indivMax = 0
-        cumulMax = 0
-        dateConsult = datetime.date.today() - datetime.timedelta(29)
+        dateTimeStat = datetime.datetime.combine(datetime.datetime.today(), datetime.time.max) - datetime.timedelta(29)
+        dateStat = dateTimeStat.date()
 
-        context['dateStart'] = dateConsult
-        context['dateEnd'] = datetime.date.today()
+        post = Post.objects.filter(pk=self.kwargs.get('pk')).first()
+        indivConsults = { 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
+        cumulConsults = { 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
+        indivFavs = { 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
+        cumulFavs = { 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
 
         for i in range(30):
-            indivConsults[dateConsult] = PostConsult.objects.filter(date=dateConsult, post=post).count()
-            cumulConsults[dateConsult] = PostConsult.objects.filter(date__lte=dateConsult, post=post).count()
+            indivConsults['data'][dateStat] = PostConsult.objects.filter(date=dateStat, post=post).count()
+            cumulConsults['data'][dateStat] = PostConsult.objects.filter(date__lte=dateStat, post=post).count()
+            indivFavs['data'][dateStat] = PostFavorite.objects.filter(date__date=dateStat, post=post).count()
+            cumulFavs['data'][dateStat] = PostFavorite.objects.filter(date__lte=dateTimeStat, post=post).count()
             
-            if indivConsults[dateConsult] > indivMax:
-                indivMax = indivConsults[dateConsult]
+            if indivConsults['data'][dateStat] > indivConsults['height']:
+                indivConsults['height'] = indivConsults['data'][dateStat]
 
-            if cumulConsults[dateConsult] > cumulMax:
-                cumulMax = cumulConsults[dateConsult]
+            if cumulConsults['data'][dateStat] > cumulConsults['height']:
+                cumulConsults['height'] = cumulConsults['data'][dateStat]
 
-            dateConsult += datetime.timedelta(1)
+            if indivFavs['data'][dateStat] > indivFavs['height']:
+                indivFavs['height'] = indivFavs['data'][dateStat]
+
+            if cumulFavs['data'][dateStat] > cumulFavs['height']:
+                cumulFavs['height'] = cumulFavs['data'][dateStat]
+
+            dateTimeStat += datetime.timedelta(1)
+            dateStat = dateTimeStat.date()
+
+        indivConsults['height'] += 10 - (indivConsults['height'] % 10)
+        cumulConsults['height'] += 10 - (cumulConsults['height'] % 10)
+        indivFavs['height'] += 10 - (indivFavs['height'] % 10)
+        cumulFavs['height'] += 10 - (cumulFavs['height'] % 10)
         
         context['title'] = "Statistiques de " + post.title
         context['consults'] = PostConsult.objects.filter(post=self.kwargs.get('pk'))
+        context['favs'] = PostFavorite.objects.filter(post=self.kwargs.get('pk'))
         context['indivConsults'] = indivConsults
         context['cumulConsults'] = cumulConsults
-        context['indivGraphHeight'] = indivMax + 10 - (indivMax % 10)
-        context['cumulGraphHeight'] = cumulMax + 10 - (cumulMax % 10)
+        context['indivFavs'] = indivFavs
+        context['cumulFavs'] = cumulFavs
 
+        #yo = 0 / 0
 
         return context
 
