@@ -15,14 +15,16 @@
             height: 500vh;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/ol-geocoder@latest/dist/ol-geocoder.min.css" rel="stylesheet">
     <title>OpenLayers example</title>
 </head>
 
 <body>
-    <h2>My Map</h2>
+    <h2 id="title">My Map</h2>
     <div id="map" class="map"></div>
     <button onclick="yo()">C ou ça</button>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ol-geocoder"></script>
     <script type="text/javascript">
         const iconFeature = new ol.Feature({
             geometry: new ol.geom.Point(ol.proj.fromLonLat([4.3525, 50.8466])),
@@ -88,10 +90,34 @@
 
         map.addInteraction(modify);
 
-        function yo()
-        {
-            alert(ol.proj.toLonLat(iconFeature.getGeometry().getCoordinates(), 'EPSG:3857'));
-        }
+        var geocoder = new Geocoder('nominatim', {
+            provider: 'osm',
+            key: '',
+            lang: 'fr-BE', //en-US, fr-FR
+            placeholder: 'Search for ...',
+            targetType: 'glass-button',
+            limit: 10,
+            keepOpen: false,
+            autoComplete: true,
+            autoCompleteTimeout: 200
+        });
+        map.addControl(geocoder);
+
+        geocoder.on('addresschosen', function (evt) {
+            var feature = evt.feature,
+                coord = evt.coordinate,
+                address = evt.address;
+                alert(ol.proj.toLonLat(coord, 'EPSG:3857')+"\n"+address);
+                iconFeature.setGeometry(new ol.geom.Point(coord));
+            // some popup solution
+            //overlay.setPosition(coord);
+            console.info(evt);
+            let addr = address.original.details;
+            let city = (addr.city)? addr.city : (addr.town)? addr.town: (addr.village)? addr.village : underfined;
+            let state = (addr.state)? addr.state : addr.region;
+            document.getElementById('title').innerHTML = '<p>' + addr.road + ' ' + addr.house_number + ', ' + addr.postcode + ' ' + city + ', ' + state + ' ' + addr.country_code.toUpperCase() + '</p>';
+            if ( !addr.house_number ) alert('non non c pa bon');
+        });
     </script>
 </body>
 

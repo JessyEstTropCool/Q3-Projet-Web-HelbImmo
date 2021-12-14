@@ -37,8 +37,12 @@ class PaginatedMixin():
 
 class FavoritesMixin():
     def get_user_favorites(self):
-        favs = PostFavorite.objects.filter(user=self.request.user)
-        return Post.objects.filter(id__in=favs.values('post'))
+        if self.request.user.is_authenticated:
+            favs = PostFavorite.objects.filter(user=self.request.user)
+            return Post.objects.filter(id__in=favs.values('post'))
+        else:
+            return None
+        
 
 
 def add_favorite(request):

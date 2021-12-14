@@ -135,3 +135,8 @@ body {
   {
     resize: none;
   }
+
+  .gcd-txt-control
+  {
+    height:2em;
+  }

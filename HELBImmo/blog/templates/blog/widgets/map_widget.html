@@ -1,0 +1,7 @@
+{% load static %}
+<input type="text" name="{{ widget.name }}" value="{{ widget.value }}"
+{% for key, value in widget.attrs.items %}
+{{ key }}="{{ value }}"
+{% endfor %}
+>
+<div id="map" style="height: 30vh;" data-image="{% static 'blog/apple.png' %}"></div>

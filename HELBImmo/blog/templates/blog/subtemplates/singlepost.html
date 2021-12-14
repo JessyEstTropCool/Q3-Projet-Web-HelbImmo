@@ -14,19 +14,22 @@
         </div>
         <div class="d-flex flex-column media-body">
             <h2><a class="article-title font-weight-bold" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
-            <h6>
-                Chose - 
-                {% if post.to_sell == True %}
-                    A Vendre
-                {% else %}
-                    A Louer
-                {% endif %}
-            </h6>
+            <div class="mb-2">
+                <h6 class="mb-0">
+                    Chose - 
+                    {% if post.to_sell == True %}
+                        A Vendre
+                    {% else %}
+                        A Louer
+                    {% endif %}
+                </h6>
+                <small class="text-muted ml-auto">{{ post.region_city }} {{ post.country_code }}</small>
+            </div>
             <div class="d-flex justify-content-between mb-2">
                 {% include "blog/subtemplates/fav-button.html" %}
                 <span class="font-weight-bold">{{ post.price }} €{% if post.to_sell == False %}/mois{% endif %}</span>
             </div>
-            <p class="article-content rounded border p-1 flex-grow">{{ post.content }}</p>
+            <p class="article-content rounded border p-1 flex-grow m-0">{{ post.content }}</p>
         </div>
     </div>
 </article>

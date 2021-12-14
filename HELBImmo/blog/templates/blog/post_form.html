@@ -5,7 +5,7 @@
         <form method="POST" enctype='multipart/form-data'>
             {% csrf_token %}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Blog Post</legend>
+                <legend class="border-bottom mb-4">Post Post</legend>
                 {{ form|crispy }}
             </fieldset>
             <div class="form-group">
@@ -14,3 +14,6 @@
         </form>
     </div>
 {% endblock content %}
+{% block scripts %}
+    {{ form.media }}
+{% endblock %}
