@@ -1,4 +1,8 @@
 {% extends "blog/base.html" %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/css/ol.css">
+{% endblock %}
 {% block content %}
 <article class="content-section">
     <input type="hidden" class="js-view" view-url="{% url 'post-consult' %}" data-postid="{{ view.kwargs.pk }}">
@@ -32,13 +36,14 @@
             <a class="btn btn-sm btn-secondary" href="{% url 'post-update' object.id %}"><i class="bi bi-arrow-repeat"></i> Update</a>
             <a class="btn btn-sm btn-danger" href="{% url 'post-delete' object.id %}"><i class="bi bi-trash"></i> Delete</a>
         {% endif %}
+        <div>Addresse : {{ object.road_num }}, {{ object.region_city }} {{ object.country_code }}</div>
         <ul class="pl-0 my-2">
             <li class="d-flex justify-content-between">Number of rooms : <span>{{ object.room_amount }}</span></li>
             <li class="d-flex justify-content-between">Livable surface : <span>{{ object.livable_surface }}</span></li>
         </ul>
         Description :
         <p class="article-content rounded border p-1">{{ object.content }}</p>
-        <div tabindex="1" id="js-map" latitude="{{ object.latitude }}" longitude="{{ object.longitude }}" style="height: 30vh;"></div>
+        <div tabindex="1" id="js-map" data-image="{% static 'blog/marker.png' %}" latitude="{{ object.latitude }}" longitude="{{ object.longitude }}" style="height: 30vh;"></div>
     </div>
 </article>
 <article class="content-section">
@@ -53,8 +58,8 @@
 </article>
 {% endblock content %}
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
 <script>
-
     $(document).ready(function () {
         let info = $(".js-view").first();
         $.ajax({
@@ -67,6 +72,47 @@
                 console.log(result.good);
             }
         }); 
+
+        let target = document.getElementById("js-map");
+
+        let iconFeature = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([target.getAttribute('longitude'),target.getAttribute('latitude')]))
+        });
+
+        let iconStyle = new ol.style.Style({
+            image: new ol.style.Icon({
+                anchor: [0.5, 1],
+                anchorXUnits: 'fraction',
+                anchorYUnits: 'fraction',
+                src: target.getAttribute('data-image'),
+            }),
+        });
+
+        iconFeature.setStyle(iconStyle);
+
+        let vectorSource = new ol.source.Vector({
+            features: [iconFeature],
+        });
+
+        let vectorLayer = new ol.layer.Vector({
+            source: vectorSource,
+        });
+
+        let mapView = new ol.View({
+            center: ol.proj.fromLonLat([target.getAttribute('longitude'),target.getAttribute('latitude')]),
+            zoom: 16
+        });
+
+        var map = new ol.Map({
+            target: target,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                vectorLayer
+            ],
+            view: mapView
+        });
     });
 </script>
 {% endblock scripts %}

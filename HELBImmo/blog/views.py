@@ -97,7 +97,7 @@ class SearchResultsListView(PaginatedMixin, FavoritesMixin, ListView):
     def get_queryset(self):
         terms = self.request.GET.get('q')
         results = Post.objects.filter(
-            Q(content__icontains=terms) | Q(title__icontains=terms)
+            Q(content__icontains=terms) | Q(title__icontains=terms) | Q(region_city__icontains=terms)
         ).order_by('-date_posted')
 
         if ( self.request.GET.get('budgetMax') ):
@@ -250,7 +250,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    #fields = ['title', 'content']
+    success_url = '/'
     form_class = PostCreateForm
 
     def form_valid(self, form):

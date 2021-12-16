@@ -1,7 +1,9 @@
 const target = document.getElementById('map');
+const longitude = document.getElementById('id_longitude').value;
+const latitude = document.getElementById('id_latitude').value;
 
 const iconFeature = new ol.Feature({
-    geometry: new ol.geom.Point(ol.proj.fromLonLat([0,0])),
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([longitude,latitude])),
     name: 'Null Island'
 });
 
@@ -32,8 +34,8 @@ const vectorLayer = new ol.layer.Vector({
 });*/
 
 const mapView = new ol.View({
-    center: ol.proj.fromLonLat([0, 0]),
-    zoom: 4
+    center: ol.proj.fromLonLat([longitude,latitude]),
+    zoom: 16
 });
 
 
@@ -42,8 +44,8 @@ var map = new ol.Map({
     layers: [
         new ol.layer.Tile({
             source: new ol.source.OSM()
-        })
-        //vectorLayer
+        }),
+        vectorLayer
     ],
     view: mapView
 });
@@ -69,10 +71,7 @@ var geocoder = new Geocoder('nominatim', {
     placeholder: 'Search for ...',
     targetType: 'text-input',
     limit: 3,
-    keepOpen: false,
-    autoComplete: true,
-    autoCompleteTimeout: 200,
-    featureStyle:iconStyle
+    keepOpen: false
 });
 map.addControl(geocoder);
 
@@ -87,6 +86,7 @@ geocoder.on('addresschosen', function (evt) {
     let addr = address.original.details;
     let city = (addr.city)? addr.city : (addr.town)? addr.town: (addr.village)? addr.village : underfined;
     let state = (addr.state)? addr.state : addr.region;
-    let fullAddr = addr.road + ' ' + addr.house_number + ', ' + addr.postcode + ' ' + city + ', ' + state + ' ' + addr.country_code.toUpperCase() + ' Coord : ' + ol.proj.toLonLat(coord, 'EPSG:3857');
+    let lonlat = ol.proj.toLonLat(coord, 'EPSG:3857');
+    let fullAddr = /*address.original.formatted + '|' + */addr.road + ' ' + addr.house_number + '|' + addr.postcode + ' ' + city + ', ' + state + '|' + addr.country_code.toUpperCase() + '|' + lonlat[0] + '|' + lonlat[1];
     document.getElementById('id_address').setAttribute('value', fullAddr);
 });

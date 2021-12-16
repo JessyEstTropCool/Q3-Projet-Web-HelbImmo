@@ -16,8 +16,8 @@ class Post(models.Model):
     thumbnail = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')
     to_sell = models.BooleanField(default=True)
     #addresse
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, default=0)
-    latitude = models.DecimalField(max_digits=8, decimal_places=6, default=0)
+    longitude = models.DecimalField(max_digits=13, decimal_places=10, default=0)
+    latitude = models.DecimalField(max_digits=12, decimal_places=10, default=0)
     road_num = models.CharField( max_length=100, default='Grand Place 14')
     region_city = models.CharField(max_length=100, default='1000 City of Brussels, Brussels-Capital')
     country_code = models.CharField(max_length=2, default='BE')

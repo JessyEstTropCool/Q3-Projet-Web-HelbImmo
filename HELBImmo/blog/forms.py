@@ -48,6 +48,22 @@ class PostCreateForm(forms.ModelForm):
     typeBien = forms.ChoiceField(choices = CHOICES, label="Type de bien", 
                                 initial='', widget=forms.Select(), required=True)
 
+    def clean(self):
+        addr = self.cleaned_data['address']
+
+        self.cleaned_data['road_num'] = addr[0]
+        self.cleaned_data['region_city'] = addr[1]
+        self.cleaned_data['country_code'] = addr[2]
+        self.cleaned_data['longitude'] = format(float(addr[3]), ".10f")
+        self.cleaned_data['latitude'] = format(float(addr[4]), ".10f")
+
+        return self.cleaned_data
+
+    def clean_address(self):
+        addr = self.cleaned_data['address'].split('|')
+        
+        return addr
+
     """def save(self, *args, **kwargs):
         self.instance.save()
         return self.instance"""

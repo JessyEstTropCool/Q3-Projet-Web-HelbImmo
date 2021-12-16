@@ -17,7 +17,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'blog/main.css' %}">
     <link rel="icon" type="image/png" sizes="512x512" href="{% static 'blog/Icon.png' %}">
 
-    {% block CSS %}{% endblock %}
+    {% block css %}{% endblock %}
 
     {% if title %}
     <title>HELBImmo - {{ title }}</title>
@@ -173,13 +173,13 @@
                 }
             });
 
-            $('#js-map').each(function (compt, elem) {
+            /*$('#js-map').each(function (compt, elem) {
                 map = new OpenLayers.Map(elem.id);
                 map.addLayer(new OpenLayers.Layer.OSM());
 
                 //alert(0+" - "+0);
 
-                var lonLat = new OpenLayers.LonLat(4.3525, 50.8466/*elem.getAttribute('longitude'), elem.getAttribute('latitude') */)
+                var lonLat = new OpenLayers.LonLat(elem.getAttribute('longitude'), elem.getAttribute('latitude'))
                     .transform(
                         new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
                         map.getProjectionObject() // to Spherical Mercator Projection
@@ -193,7 +193,7 @@
                 markers.addMarker(new OpenLayers.Marker(lonLat));
 
                 map.setCenter(lonLat, zoom);
-            });
+            });*/
 
             $('#searchform').submit(function () {
                 $(this)
