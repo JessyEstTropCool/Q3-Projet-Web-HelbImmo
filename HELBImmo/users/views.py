@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
+from django.views.generic import ListView
+from .models import Profile
 
 def register(request):
     if request.method == 'POST':
@@ -38,3 +40,16 @@ def profile(request):
     }
 
     return render(request, 'users/profile.html', context)
+
+class NotficationsView(ListView):
+    model = Profile
+    template_name = 'blog/home.html' # <app>/<model>_<viewtype>.html
+    context_object_name = 'posts'
+    ordering = ['-date_posted']
+    paginate_by = 5
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        self.paginate(context)
+        context['user_favs'] = self.get_user_favorites()
+        return context

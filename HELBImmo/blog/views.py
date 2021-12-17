@@ -234,7 +234,7 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    success_url = '/'
+    #success_url = '/'
     form_class = PostCreateForm
     gallery_form_class = GalleryForm
 
@@ -250,7 +250,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    success_url = '/'
     form_class = PostCreateForm
 
     def form_valid(self, form):

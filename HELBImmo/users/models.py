@@ -25,5 +25,9 @@ class Criteria(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     budget = models.DecimalField(max_digits=16, decimal_places=2, default=0)
     minimum_surface = models.DecimalField(max_digits=6, decimal_places=2, default=0)
-    #locality = models.ForeignKey( City)
+    locality = models.CharField(max_length=100, default='')
     room_amount = models.IntegerField(default=0)
+    public = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.user.username} Criteria'
