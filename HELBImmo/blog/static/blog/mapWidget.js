@@ -1,9 +1,12 @@
 const target = document.getElementById('map');
-const longitude = document.getElementById('id_longitude').value;
-const latitude = document.getElementById('id_latitude').value;
+const longitude = document.getElementById('id_longitude');
+const latitude = document.getElementById('id_latitude');
+const road_num = document.getElementById('id_road_num');
+const region_city = document.getElementById('id_region_city');
+const country_code = document.getElementById('id_country_code');
 
 const iconFeature = new ol.Feature({
-    geometry: new ol.geom.Point(ol.proj.fromLonLat([longitude,latitude])),
+    geometry: new ol.geom.Point(ol.proj.fromLonLat([longitude.value,latitude.value])),
     name: 'Null Island'
 });
 
@@ -34,7 +37,7 @@ const vectorLayer = new ol.layer.Vector({
 });*/
 
 const mapView = new ol.View({
-    center: ol.proj.fromLonLat([longitude,latitude]),
+    center: ol.proj.fromLonLat([longitude.value,latitude.value]),
     zoom: 16
 });
 
@@ -79,14 +82,22 @@ geocoder.on('addresschosen', function (evt) {
     var feature = evt.feature,
         coord = evt.coordinate,
         address = evt.address;
-    iconFeature.setGeometry(new ol.geom.Point(coord));
-    // some popup solution
-    //overlay.setPosition(coord);
-    console.info(evt);
+        
     let addr = address.original.details;
-    let city = (addr.city)? addr.city : (addr.town)? addr.town: (addr.village)? addr.village : underfined;
+    let city = (addr.city)? addr.city : (addr.town)? addr.town: (addr.village)? addr.village : undefined;
     let state = (addr.state)? addr.state : addr.region;
     let lonlat = ol.proj.toLonLat(coord, 'EPSG:3857');
-    let fullAddr = /*address.original.formatted + '|' + */addr.road + ' ' + addr.house_number + '|' + addr.postcode + ' ' + city + ', ' + state + '|' + addr.country_code.toUpperCase() + '|' + lonlat[0] + '|' + lonlat[1];
-    document.getElementById('id_address').setAttribute('value', fullAddr);
+    let fullAddr = addr.road + ' ' + addr.house_number + '|' + addr.postcode + ' ' + city + ', ' + state + '|' + addr.country_code.toUpperCase() + '|' + lonlat[0] + '|' + lonlat[1];
+
+    iconFeature.setGeometry(new ol.geom.Point(coord));
+    feature.setStyle(new ol.style.Style(null));
+    //console.info(evt);
+
+    road_num.value = addr.road + ' ' + addr.house_number;
+    region_city.value = addr.postcode + ' ' + city + ', ' + state;
+    country_code.value = addr.country_code.toUpperCase();
+    longitude.value = +lonlat[0].toFixed(10);
+    latitude.value = +lonlat[1].toFixed(10);
+
+    document.getElementById('id_address').value = fullAddr;
 });

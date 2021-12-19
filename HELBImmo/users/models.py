@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 from PIL import Image
-from blog.models import PostFavorite
+from django.utils import timezone
+from blog.models import Post
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -31,3 +32,13 @@ class Criteria(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Criteria'
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    notif_type = models.CharField(max_length=20)
+    source = models.ForeignKey(Post, on_delete=models.CASCADE)
+    date_recieved = models.DateTimeField( default=timezone.now )
+    read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'Notification for {self.user.username} : {self.source.title} -> {self.notif_type}'

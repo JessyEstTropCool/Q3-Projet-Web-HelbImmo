@@ -1,0 +1,44 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block content %}
+<article class="content-section d-flex flex-column h-100">
+    <h1 class="mb-2">Vos Notifications</h1>
+    <div class="bg-secondary border rounded flex-grow mb-2">
+        {% for notif in notifs %}
+            {% if notif.read %}
+                <article class="notification alert-light border-bottom border-muted">
+            {% else %}
+                <article class="notification alert-warning border-bottom border-warning">
+                <span class="js-read" data-notifid="{{ notif.id }}" read-url="{% url 'read-notification' %}"></span>
+            {% endif %}
+                <div class="article-metadata">
+                    <small class="text-muted">{{ notif.date_recieved|date:"E d, Y" }}</small>
+                </div>
+                <div class="text-dark mb-2">
+                    {% if notif.notif_type == 'Recommended' %}
+                        Nous avons trouvé une annonce qui pourrait vous interesser
+                    {% elif notif.notif_type == 'Updated' %}
+                        Cette annonce de votre watchlist a été mis à jour
+                    {% endif %}
+                </div>
+                {% include "blog/subtemplates/small-post.html" with post=notif.source %}
+            </article>
+        {% endfor %}
+    </div>
+</article>
+{% endblock content %}
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $(".js-read").each(function () {
+            let info = $(this);
+            $.ajax({
+                url: info.attr('read-url'),
+                data: {
+                    'notifid': info.attr('data-notifid')
+                }
+            });
+        });
+    });
+</script>
+{% endblock scripts %}

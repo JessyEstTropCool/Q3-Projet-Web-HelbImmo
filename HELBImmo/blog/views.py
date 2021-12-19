@@ -11,6 +11,7 @@ from django.views.generic import (
 from django.http import JsonResponse, request
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from users.models import Notification, Criteria
 from .models import Post, PostConsult, PostFavorite
 from .forms import PostCreateForm, GalleryForm
 import datetime
@@ -42,8 +43,6 @@ class FavoritesMixin():
             return Post.objects.filter(id__in=favs.values('post'))
         else:
             return None
-        
-
 
 def add_favorite(request):
     if request.user.is_authenticated:
@@ -85,6 +84,7 @@ class PostListView(PaginatedMixin, FavoritesMixin, ListView):
         context = super().get_context_data(**kwargs)
         self.paginate(context)
         context['user_favs'] = self.get_user_favorites()
+        context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
         return context
 
 class SearchResultsListView(PaginatedMixin, FavoritesMixin, ListView):
@@ -234,13 +234,24 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    #success_url = '/'
     form_class = PostCreateForm
     gallery_form_class = GalleryForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super(PostCreateView, self).form_valid(form)
+        response = super(PostCreateView, self).form_valid(form)
+
+        post = form.instance
+
+        criterias = Criteria.objects.filter(public=True, budget__gte=post.price, minimum_surface__lte=post.livable_surface, room_amount__lte=post.room_amount)
+        users_to_notify = User.objects.filter(id__in=criterias.values('user'))
+
+        for user in users_to_notify:
+            if user.criteria.locality.lower() in post.region_city.lower():
+                notif = Notification(source=form.instance, user=user, notif_type="Recommended")
+                notif.save()
+
+        return response
 
     """def post(self, request, *args, **kwargs):
         main_form = self.form_class(request.POST)
@@ -254,7 +265,16 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def form_valid(self, form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        favs = PostFavorite.objects.filter(post=form.instance)
+        users_to_notify = User.objects.filter(id__in=favs.values('user'))
+
+        for user in users_to_notify:
+            notif = Notification(source=form.instance, user=user, notif_type="Updated")
+            notif.save()
+
+        return response
 
     def test_func(self):
         post = self.get_object()

@@ -37,7 +37,7 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarToggle">
                     <div class="navbar-nav mr-auto">
-                        <a class="nav-item nav-link" href="{% url 'blog-about' %}">About</a>
+                        
                     </div>
                     <!-- Navbar Right Side -->
                     <form id="searchform" class="d-flex mr-auto dropdown" action="{% url 'search-results' %}" method="get">
@@ -48,10 +48,17 @@
                             aria-expanded="false"></a>
 
                         <div class="dropdown-menu text-center border p-3 m-0 right-0" aria-labelledby="dropdownFiltersLink">
-                            <input type="number" class="form-control" name="budgetMin" value="{{ request.GET.budgetMin }}" min="0" placeholder="Minimum">
-                            <input type="number" class="form-control" name="budgetMax" value="{{ request.GET.budgetMax }}" min="0" placeholder="Maximum">
-                            <div class="dropdown-divider"></div>
-                            <input type="submit" class="btn btn-small btn-info ml-auto" value="Recherche détaillée">
+                            <fieldset class="form-group">
+                                <legend class="border-bottom text-left">Filtres</legend>
+
+                                <div class="d-flex">
+                                    <input type="number" class="form-control" name="budgetMin" value="{{ request.GET.budgetMin }}" min="0" placeholder="Minimum">
+                                    <span class="h3 mx-1">-</span>
+                                    <input type="number" class="form-control" name="budgetMax" value="{{ request.GET.budgetMax }}" min="0" placeholder="Maximum">
+                                </div>
+                                <div class="dropdown-divider"></div>
+                                <input type="submit" class="btn btn-small btn-info ml-auto" value="Recherche détaillée">
+                            </fieldset>
                         </div>
 
                         <button class="btn btn-info rounded-left-0" form="searchform">
@@ -61,8 +68,7 @@
                     <div class="navbar-nav">
                         {% if user.is_authenticated %}
                         <a class="nav-item nav-link" href="{% url 'user-posts' user %}">
-                            <img class="text-img rounded-circle mr-1" src="{{ user.profile.image.url }}">
-                            {{ user.username }}
+                            <img class="text-img rounded-circle" src="{{ user.profile.image.url }}">
                         </a>
                         <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
                         {% else %}
@@ -75,32 +81,43 @@
         </nav>
     </header>
 
-    <div class="d-flex container">
+    <div class="d-flex">
         <div class="col-md-4">
-            <div class="content-section">
-                <h3>Our Sidebar</h3>
-                <p class='text-muted'>You can put any information here you'd like.
-                <ul class="list-group">
+            <div class="sidebar content-section p-2 sticky-top">
+                <ul class="list-group d-flex flex-column justify-content-around h-100">
                     {% if user.is_authenticated %}
-                    <li class="list-group-item list-group-item-light">
-                        <a href="{% url 'post-create' %}">New Post</a>
+                    <img class="rounded-circle account-img mx-auto my-2" src="{{ user.profile.image.url }}">
+                    <div class="h6 text-center">
+                        {{ user.username }}
+                        <br>
+                        <small class="text-muted">{{ user.email }}</small>
+                    </div>
+                        {% if user.is_staff %}
+                        <li class="list-group-item list-group-item-light text-center d-flex align-items-center flex-grow">
+                            <a class="mx-auto h5 text-decoration-none" href="{% url 'admin:index' %}">Administration</a>
+                        </li>
+                        {% endif %}
+                    <li class="list-group-item list-group-item-light text-center d-flex align-items-center flex-grow">
+                        <a class="mx-auto h5 text-decoration-none" href="{% url 'post-create' %}">Nouvelle Annonce</a>
                     </li>
-                    <li class="list-group-item list-group-item-light">
-                        <a href="{% url 'user-favorites' %}">Your watchlist</a>
+                    <li class="list-group-item list-group-item-light text-center d-flex align-items-center flex-grow">
+                        <a class="mx-auto h5 text-decoration-none" href="{% url 'user-favorites' %}">Votre Watchlist</a>
                     </li>
-                    <li class="list-group-item list-group-item-light">
-                        <a href="#">Your Criteria</a>
+                    <li class="list-group-item list-group-item-light text-center d-flex align-items-center flex-grow">
+                        <a class="mx-auto h5 text-decoration-none" href="#">Vos Critères</a>
                     </li>
-                    <li class="list-group-item list-group-item-light">
-                        <a href="#">Notifications</a>
+                    <li class="list-group-item list-group-item-light text-center d-flex align-items-center flex-grow">
+                        <a class="mx-auto h5 text-decoration-none" href="{% url 'notifications' %}">Notifications
+                            {% if notif_count > 0 %}
+                                ({{ notif_count }})
+                            {% endif %}
+                        </a>
                     </li>
                     {% endif %}
-                    <li class="list-group-item list-group-item-light">Latest Posts</li>
-                    <li class="list-group-item list-group-item-light">Announcements</li>
-                    <li class="list-group-item list-group-item-light">Calendars</li>
-                    <li class="list-group-item list-group-item-light">etc</li>
+                    <div class="text-center mt-2">
+                        <a class="h6 text-decoration-none" href="{% url 'blog-about' %}">A propos de nous</a>
+                    </div>
                 </ul>
-                </p>
             </div>
         </div>
         <main role="main" class="container flex-grow">
@@ -139,7 +156,7 @@
                 $('[data-toggle="tooltip"]').tooltip()
             })
 
-            $(".fav").click(function () {
+            $(".js-fav").click(function () {
                 let btn = $(this);
                 let postid = $(this).data('postid');
                 console.log("fav " + postid + "!");
@@ -172,28 +189,6 @@
                     elem.setAttribute('href', '?' + searchParams);
                 }
             });
-
-            /*$('#js-map').each(function (compt, elem) {
-                map = new OpenLayers.Map(elem.id);
-                map.addLayer(new OpenLayers.Layer.OSM());
-
-                //alert(0+" - "+0);
-
-                var lonLat = new OpenLayers.LonLat(elem.getAttribute('longitude'), elem.getAttribute('latitude'))
-                    .transform(
-                        new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                        map.getProjectionObject() // to Spherical Mercator Projection
-                    );
-
-                var zoom = 16;
-
-                var markers = new OpenLayers.Layer.Markers("Markers");
-                map.addLayer(markers);
-
-                markers.addMarker(new OpenLayers.Marker(lonLat));
-
-                map.setCenter(lonLat, zoom);
-            });*/
 
             $('#searchform').submit(function () {
                 $(this)

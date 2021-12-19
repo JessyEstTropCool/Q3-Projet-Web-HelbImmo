@@ -24,5 +24,5 @@ urlpatterns = [
     path('post/<int:pk>/stats/', PostStatsView.as_view(), name='post-stats'),
     path('about/', views.about, name='blog-about'),
     path('ajax/fav/', views.add_favorite, name='favorite'),
-    path('ajax/consult', views.post_consulted, name='post-consult')
+    path('ajax/consult/', views.post_consulted, name='post-consult')
 ]

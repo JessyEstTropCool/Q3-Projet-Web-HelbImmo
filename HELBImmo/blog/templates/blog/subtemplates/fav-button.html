@@ -1,4 +1,4 @@
-<span class="btn fav text-warning hover-dark p-0" fav-url="{% url 'favorite' %}" data-postid="{{post.id}}">
+<span class="btn js-fav text-warning hover-dark p-0" fav-url="{% url 'favorite' %}" data-postid="{{post.id}}">
     {% if post in user_favs %}
         <i class="bi bi-star-fill"></i>
         <span>Dans les favoris</span>

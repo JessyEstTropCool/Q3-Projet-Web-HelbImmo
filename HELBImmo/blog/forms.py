@@ -22,13 +22,13 @@ class PostCreateForm(forms.ModelForm):
         'room_amount', 
         'thumbnail'
         ]
-        widgets = {
+        """widgets = {
             'road_num': forms.HiddenInput(), 
             'region_city': forms.HiddenInput(), 
             'country_code': forms.HiddenInput(), 
             'longitude': forms.HiddenInput(),
             'latitude': forms.HiddenInput()
-        }
+        }"""
 
     TRUE_FALSE_CHOICES = (
         (True, 'A vendre'),
@@ -52,9 +52,10 @@ class PostCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         form = kwargs.get('instance')
 
-        kwargs.update(initial={
-            'address': form.road_num + '|' + form.region_city + '|' + form.country_code + '|' + str(form.longitude) + '|' + str(form.latitude)
-        })
+        if form is not None:
+            kwargs.update(initial={
+                'address': form.road_num + '|' + form.region_city + '|' + form.country_code + '|' + str(form.longitude) + '|' + str(form.latitude)
+            })
 
         super().__init__(*args, **kwargs)
 

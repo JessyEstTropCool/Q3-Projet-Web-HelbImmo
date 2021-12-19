@@ -1,10 +1,14 @@
 {% extends "blog/base.html" %}
 {% load static %}
 {% block content %}
-<h1 class="text-center mb-4">Bienvenue !</h1>
-{% include "blog/subtemplates/pagination.html" %}
-{% for post in posts %}
-    {% include "blog/subtemplates/singlepost.html" with post=post %}
-{% endfor %}
-{% include "blog/subtemplates/pagination.html" %}
+    {% if user.is_authenticated %}
+        <h1 class="text-center mb-4">Bienvenue, {{ user.username }} !</h1>
+    {% else %}
+        <h1 class="text-center mb-4">Bienvenue !</h1>
+    {% endif %}
+    {% include "blog/subtemplates/pagination.html" %}
+    {% for post in posts %}
+        {% include "blog/subtemplates/singlepost.html" with post=post %}
+    {% endfor %}
+    {% include "blog/subtemplates/pagination.html" %}
 {% endblock content %}

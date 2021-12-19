@@ -1,5 +1,5 @@
 {% load static %}
-<input type="hidden" name="{{ widget.name }}" value="{{ widget.value }}"
+<input type="text" name="{{ widget.name }}" value="{{ widget.value }}"
 {% for key, value in widget.attrs.items %}
 {{ key }}="{{ value }}"
 {% endfor %}

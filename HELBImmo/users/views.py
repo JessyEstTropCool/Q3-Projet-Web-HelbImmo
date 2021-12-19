@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm
 from django.views.generic import ListView
-from .models import Profile
+from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, CriteriaForm
+from .models import Notification
 
 def register(request):
     if request.method == 'POST':
@@ -22,34 +24,53 @@ def profile(request):
     if request.method == 'POST':
         u_form = UserUpdateForm(request.POST, instance=request.user)
         p_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        c_form = CriteriaForm(request.POST, instance=request.user.criteria)
 
-        if u_form.is_valid() and p_form.is_valid():
+        if u_form.is_valid() and p_form.is_valid() and c_form.is_valid():
             u_form.save()
             p_form.save()
+            c_form.save()
 
             messages.success(request, f'Your account has been updated!')
             return redirect('profile')
     else:
         u_form = UserUpdateForm(instance=request.user)
         p_form = ProfileUpdateForm(instance=request.user.profile)
+        c_form = CriteriaForm(instance=request.user.criteria)
 
 
     context = {
         'u_form': u_form,
-        'p_form': p_form
+        'p_form': p_form,
+        'c_form': c_form
     }
 
     return render(request, 'users/profile.html', context)
 
-class NotficationsView(ListView):
-    model = Profile
-    template_name = 'blog/home.html' # <app>/<model>_<viewtype>.html
-    context_object_name = 'posts'
-    ordering = ['-date_posted']
-    paginate_by = 5
+def notif_read(request):
+    notif = Notification.objects.filter(id=request.GET.get('notifid', None)).first()
+
+    notif.read = True
+    notif.save()
+
+    return JsonResponse({})
+
+class NotficationsView(LoginRequiredMixin, ListView):
+    model = Notification
+    template_name = 'users/notifs.html' # <app>/<model>_<viewtype>.html
+    context_object_name = 'notifs'
+    ordering = ['-date_recieved']
+    
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by('-date_recieved')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        self.paginate(context)
-        context['user_favs'] = self.get_user_favorites()
+
+        notif_count = self.get_queryset().filter(read=False).count()
+
+        if notif_count > 0:
+            messages.warning(self.request, f'Vous avez {notif_count} nouvelle(s) notification(s) !')
+
+        context['title'] = 'Notifications'
         return context

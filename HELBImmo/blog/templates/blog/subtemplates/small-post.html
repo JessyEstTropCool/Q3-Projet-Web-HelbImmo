@@ -1,0 +1,24 @@
+<a href="{% url 'post-detail' post.id %}" class="article-title">
+    <article class="p-2 alert-light rounded border border-secondary">
+        <div class="media align-items-stretch">
+            <div class="post-img mr-2 p-1 border-right">
+                <img class="img-fluid w-100 rounded m-auto" src="{{ post.thumbnail.url }}">
+            </div>
+            <div class="d-flex flex-column media-body">
+                <h4>{{ post.title }}</h4>
+                <small class="mb-0">
+                    Chose - 
+                    {% if post.to_sell == True %}
+                        A Vendre
+                    {% else %}
+                        A Louer
+                    {% endif %}
+                </small>
+                <small class="text-muted">{{ post.region_city }} {{ post.country_code }}</small>
+                <div class="mb-2">
+                    <span class="font-weight-bold">{{ post.price }} €{% if post.to_sell == False %}/mois{% endif %}</span>
+                </div>
+            </div>
+        </div>
+    </article>
+</a>
