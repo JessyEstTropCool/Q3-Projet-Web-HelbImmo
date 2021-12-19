@@ -38,7 +38,6 @@ def profile(request):
         p_form = ProfileUpdateForm(instance=request.user.profile)
         c_form = CriteriaForm(instance=request.user.criteria)
 
-
     context = {
         'u_form': u_form,
         'p_form': p_form,
@@ -46,6 +45,25 @@ def profile(request):
     }
 
     return render(request, 'users/profile.html', context)
+
+@login_required
+def criteria(request):
+    if request.method == 'POST':
+        c_form = CriteriaForm(request.POST, instance=request.user.criteria)
+
+        if c_form.is_valid():
+            c_form.save()
+
+            messages.success(request, f'Vos critères on été mis à jour!')
+            return redirect('blog-home')
+    else:
+        c_form = CriteriaForm(instance=request.user.criteria)
+
+    context = {
+        'c_form': c_form
+    }
+
+    return render(request, 'users/criteria.html', context)
 
 def notif_read(request):
     notif = Notification.objects.filter(id=request.GET.get('notifid', None)).first()

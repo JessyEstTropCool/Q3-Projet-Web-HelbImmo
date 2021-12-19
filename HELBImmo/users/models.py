@@ -29,6 +29,7 @@ class Criteria(models.Model):
     locality = models.CharField(max_length=100, default='')
     room_amount = models.IntegerField(default=0)
     public = models.BooleanField(default=False)
+    sell_method = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.user.username} Criteria'

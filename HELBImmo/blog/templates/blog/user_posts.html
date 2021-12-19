@@ -6,7 +6,8 @@
             <h2 class="account-heading">{{ author.username }}</h2>
             <p class="text-secondary">{{ author.email }}</p>
             {% if author == user %}
-                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'profile' %}">Update</a>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'profile' %}">Mettre à jour</a>
+                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{% url 'criteria' %}">Changer les critères</a>
             {% endif %}
         </div>
     </div>

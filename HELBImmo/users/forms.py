@@ -27,15 +27,22 @@ ACCESS_CHOICES = [
     (True, 'Activées')
 ]
 
+SELLING_METHODS = [
+    (False, 'Location'),
+    (True, 'Vente')
+]
+
 class CriteriaForm(forms.ModelForm):
     class Meta:
         model = Criteria
-        fields = ['public', 'budget', 'locality', 'minimum_surface', 'room_amount']
+        fields = ['public', 'budget', 'sell_method', 'locality', 'minimum_surface', 'room_amount']
         widgets = {
-            'public' : forms.Select(choices=ACCESS_CHOICES)
+            'public' : forms.Select(choices=ACCESS_CHOICES),
+            'sell_method' : forms.Select(choices=SELLING_METHODS)
         }
         labels = {
             'public': 'Notifications',
+            'sell_method': 'Méthode de vente',
             'locality': 'Localité',
             'minimum_surface': 'Surface minimale',
             'room_amount': 'Nombre de pièces'

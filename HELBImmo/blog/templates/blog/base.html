@@ -47,16 +47,18 @@
                             id="dropdownFiltersLink" data-toggle="dropdown" aria-haspopup="true"
                             aria-expanded="false"></a>
 
-                        <div class="dropdown-menu text-center border p-3 m-0 right-0" aria-labelledby="dropdownFiltersLink">
+                        <div class="dropdown-menu border p-3 m-0 right-0" aria-labelledby="dropdownFiltersLink">
                             <fieldset class="form-group">
-                                <legend class="border-bottom text-left">Filtres</legend>
+                                <legend class="border-bottom">Filtres</legend>
 
+                                <label class="mb-1">Budget</label>
                                 <div class="d-flex">
                                     <input type="number" class="form-control" name="budgetMin" value="{{ request.GET.budgetMin }}" min="0" placeholder="Minimum">
                                     <span class="h3 mx-1">-</span>
                                     <input type="number" class="form-control" name="budgetMax" value="{{ request.GET.budgetMax }}" min="0" placeholder="Maximum">
                                 </div>
-                                <div class="dropdown-divider"></div>
+                            </fieldset>
+                            <fieldset class="form-group border-top m-0 pt-2 text-center">
                                 <input type="submit" class="btn btn-small btn-info ml-auto" value="Recherche détaillée">
                             </fieldset>
                         </div>
@@ -104,7 +106,7 @@
                         <a class="mx-auto h5 text-decoration-none" href="{% url 'user-favorites' %}">Votre Watchlist</a>
                     </li>
                     <li class="list-group-item list-group-item-light text-center d-flex align-items-center flex-grow">
-                        <a class="mx-auto h5 text-decoration-none" href="#">Vos Critères</a>
+                        <a class="mx-auto h5 text-decoration-none" href="{% url 'criteria' %}">Vos Critères</a>
                     </li>
                     <li class="list-group-item list-group-item-light text-center d-flex align-items-center flex-grow">
                         <a class="mx-auto h5 text-decoration-none" href="{% url 'notifications' %}">Notifications
