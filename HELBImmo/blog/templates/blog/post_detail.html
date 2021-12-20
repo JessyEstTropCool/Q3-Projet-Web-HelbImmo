@@ -8,7 +8,7 @@
     <input type="hidden" class="js-view" view-url="{% url 'post-consult' %}" data-postid="{{ view.kwargs.pk }}">
     <div class="article-metadata">
         <h3 class="d-flex justify-content-between mb-2">
-            <span>{{ object.title }}</span>
+            <span>{{ object.type_bien }}</span>
             {% if object.to_sell == True %}
             <span class="text-center">A Vendre</span>
             {% else %}
@@ -25,6 +25,9 @@
         <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
     </div>
     <div>
+        <h3 class="mb-2">
+            {{ object.title }}
+        </h3>
         <div class="d-flex justify-content-between m-1">
             <span>
                 {% include "blog/subtemplates/fav-button.html" %}
@@ -36,10 +39,12 @@
             <a class="btn btn-sm btn-secondary" href="{% url 'post-update' object.id %}"><i class="bi bi-arrow-repeat"></i> Update</a>
             <a class="btn btn-sm btn-danger" href="{% url 'post-delete' object.id %}"><i class="bi bi-trash"></i> Delete</a>
         {% endif %}
-        <div>Addresse : {{ object.road_num }}, {{ object.region_city }} {{ object.country_code }}</div>
         <ul class="pl-0 my-2">
-            <li class="d-flex justify-content-between">Number of rooms : <span>{{ object.room_amount }}</span></li>
-            <li class="d-flex justify-content-between">Livable surface : <span>{{ object.livable_surface }}</span></li>
+            <li id="info_addresse" class="d-flex">Addresse : {{ object.road_num }}, {{ object.region_city }} {{ object.country_code }}</li>
+            <li id="info_rooms" class="d-flex justify-content-between">Nombres de pièces : <span>{{ object.room_amount }}</span></li>
+            <li id="info_surface" class="d-flex justify-content-between">Surface vivable : <span>{{ object.livable_surface }}</span></li>
+            <li id="info_nb_etage" class="d-flex justify-content-between">Nombre d'étages : <span>{{ object.nb_etage }}</span></li>
+            <li id="info_situe_etage" class="d-flex justify-content-between">Sité à l'étage : <span>{{ object.situe_etage }}</span></li>
         </ul>
         Description :
         <p class="article-content rounded border p-1">{{ object.content }}</p>

@@ -5,6 +5,7 @@ from PIL import Image
 from django.urls import reverse
 
 class Post(models.Model):
+    type_bien = models.CharField(max_length=20, default='Maison')
     title = models.CharField( max_length=100 )
     content = models.TextField()
     date_posted = models.DateTimeField( default=timezone.now )
@@ -12,6 +13,8 @@ class Post(models.Model):
     price = models.DecimalField(max_digits=16, decimal_places=2, default=0)
     livable_surface = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     room_amount = models.IntegerField(default=0)
+    nb_etage = models.IntegerField(default=1)
+    situe_etage = models.IntegerField(default=0)
     thumbnail = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')
     to_sell = models.BooleanField(default=True)
     #addresse

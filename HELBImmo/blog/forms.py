@@ -7,7 +7,7 @@ from .widgets import MapWidget
 class PostCreateForm(forms.ModelForm):
     class Meta:
         model = Post
-        fields = ['typeBien', 
+        fields = ['type_bien', 
         'to_sell', 
         'title', 
         'content', 
@@ -20,15 +20,17 @@ class PostCreateForm(forms.ModelForm):
         'latitude',
         'livable_surface',
         'room_amount', 
+        'nb_etage',
+        'situe_etage',
         'thumbnail'
         ]
-        """widgets = {
+        widgets = {
             'road_num': forms.HiddenInput(), 
             'region_city': forms.HiddenInput(), 
             'country_code': forms.HiddenInput(), 
             'longitude': forms.HiddenInput(),
             'latitude': forms.HiddenInput()
-        }"""
+        }
 
     TRUE_FALSE_CHOICES = (
         (True, 'A vendre'),
@@ -36,9 +38,9 @@ class PostCreateForm(forms.ModelForm):
     )
 
     CHOICES = (
-        (True, 'Maison'),
-        (False, 'Appart'),
-        (None, 'Garage')
+        ('Maison', 'Maison'),
+        ('Appartement', 'Appartement'),
+        ('Garage', 'Garage')
     )
 
     address = forms.CharField(widget=MapWidget(), initial='')
@@ -46,7 +48,7 @@ class PostCreateForm(forms.ModelForm):
     to_sell = forms.ChoiceField(choices = TRUE_FALSE_CHOICES, label="A Louer/A Vendre", 
                                 initial='', widget=forms.Select(), required=True)
 
-    typeBien = forms.ChoiceField(choices = CHOICES, label="Type de bien", 
+    type_bien = forms.ChoiceField(choices = CHOICES, label="Type de bien", 
                                 initial=CHOICES[0], widget=forms.Select(), required=False)
 
     def __init__(self, *args, **kwargs):

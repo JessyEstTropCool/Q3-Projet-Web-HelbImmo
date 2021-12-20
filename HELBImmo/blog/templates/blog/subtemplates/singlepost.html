@@ -16,7 +16,7 @@
             <h2><a class="article-title font-weight-bold" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
             <div class="mb-2">
                 <h6 class="mb-0">
-                    Chose - 
+                    {{ post.type_bien }} - 
                     {% if post.to_sell == True %}
                         A Vendre
                     {% else %}
