@@ -24,5 +24,9 @@ urlpatterns = [
     path('post/<int:pk>/stats/', PostStatsView.as_view(), name='post-stats'),
     path('about/', views.about, name='blog-about'),
     path('ajax/fav/', views.add_favorite, name='favorite'),
-    path('ajax/consult/', views.post_consulted, name='post-consult')
+    path('ajax/consult/', views.post_consulted, name='post-consult'),
+    path('ajax/question/new', views.post_question, name='question-new'),
+    path('ajax/question/delete/<int:pk>', views.delete_question, name='question-delete'),
+    path('ajax/question/answer', views.post_answer, name='answer-question'),
+    path('ajax/question/answer/delete/<int:pk>', views.delete_answer, name='answer-delete')
 ]

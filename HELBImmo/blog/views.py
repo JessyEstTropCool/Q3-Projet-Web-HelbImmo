@@ -11,8 +11,9 @@ from django.views.generic import (
 from django.http import JsonResponse, request
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.utils import timezone
 from users.models import Notification, Criteria
-from .models import Post, PostConsult, PostFavorite
+from .models import Post, PostConsult, PostFavorite, Question, Reponse
 from .forms import PostCreateForm, GalleryForm
 import datetime
 
@@ -73,6 +74,41 @@ def post_consulted(request):
 
     return JsonResponse(data)
 
+def post_question(request):
+    content = request.POST.get('question')
+
+    if request.user.is_authenticated and content != None and content != '':
+        post = Post.objects.filter(id=request.POST.get('postid')).first()
+        question = Question(user=request.user, post=post, content=content)
+        question.save()
+        return render(request, 'blog/subtemplates/question.html', {'question': question})
+
+def delete_question(request, **kwargs):
+    question = Question.objects.filter(id=kwargs.get('pk')).first()
+
+    if request.user.is_authenticated and request.user == question.user:
+        question.delete()
+
+    return JsonResponse({})
+
+def post_answer(request):
+    content = request.POST.get('content')
+
+    if request.user.is_authenticated and content != None and content != '':
+        question = Question.objects.filter(id=request.POST.get('questionid')).first()
+        reponse = Reponse(user=request.user, question=question, content=content)
+        reponse.save()
+        return render(request, 'blog/subtemplates/reponse.html', {'reponse': reponse})
+
+def delete_answer(request, **kwargs):
+    reponse = Reponse.objects.filter(id=kwargs.get('pk')).first()
+
+    if request.user.is_authenticated and request.user == reponse.user:
+        question = reponse.question
+        reponse.delete()
+
+        return render(request, 'blog/subtemplates/reponse_form.html', {'question': question})
+
 class PostListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/home.html' # <app>/<model>_<viewtype>.html
@@ -84,7 +120,8 @@ class PostListView(PaginatedMixin, FavoritesMixin, ListView):
         context = super().get_context_data(**kwargs)
         self.paginate(context)
         context['user_favs'] = self.get_user_favorites()
-        context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
+        if self.request.user.is_authenticated:
+            context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
         return context
 
 class SearchResultsListView(PaginatedMixin, FavoritesMixin, ListView):
@@ -168,6 +205,7 @@ class PostDetailView(FavoritesMixin, DetailView):
         
         context['user_favs'] = self.get_user_favorites()
         context['title'] = Post.objects.filter(id=self.kwargs.get('pk')).first().title
+        context['questions'] = Question.objects.filter(post=self.kwargs.get('pk')).order_by('-date_posted')
 
         return context
 
@@ -179,7 +217,7 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(PostStatsView, self).get_context_data(**kwargs)
 
-        dateTimeStat = datetime.datetime.combine(datetime.datetime.today(), datetime.time.max) - datetime.timedelta(29)
+        dateTimeStat = datetime.datetime.combine(timezone.now(), datetime.time.max) - datetime.timedelta(29)
         dateStat = dateTimeStat.date()
 
         post = Post.objects.filter(pk=self.kwargs.get('pk')).first()
@@ -215,8 +253,9 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         cumulFavs['height'] += 10 - (cumulFavs['height'] % 10)
         
         context['title'] = "Statistiques de " + post.title
-        context['consults'] = PostConsult.objects.filter(post=self.kwargs.get('pk'))
-        context['favs'] = PostFavorite.objects.filter(post=self.kwargs.get('pk'))
+        context['consults'] = PostConsult.objects.filter(post=self.kwargs.get('pk')).count()
+        context['favs'] = PostFavorite.objects.filter(post=self.kwargs.get('pk')).count()
+        context['questions'] = Question.objects.filter(post=self.kwargs.get('pk')).count()
         context['indivConsults'] = indivConsults
         context['cumulConsults'] = cumulConsults
         context['indivFavs'] = indivFavs

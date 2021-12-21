@@ -1,0 +1,27 @@
+<article class="js-question content-section">
+    <div class="article-metadata">
+        <img class="text-img rounded-circle mr-1" src="{{ question.user.profile.image.url }}">
+        {{ question.user }}
+        <small class="text-muted">{{ question.date_posted|date:"E d, Y" }}</small>
+        {% if user == question.user %}
+            <span class="js-confirm float-right" style="display: none;">
+                Êtes-vous sur ? 
+                <button class="js-del-question btn btn-sm btn-danger py-0" data-url="{% url 'question-delete' question.id %}">Oui</button>
+                <button class="js-cancel btn btn-sm btn-secondary py-0">Annuler</button>
+            </span>
+            <span class="js-initial float-right">
+                <button class="js-open btn btn-sm btn-danger py-0">Supprimer</button>
+            </span>
+        {% endif %}
+    </div>
+    <div class="border rounded p-2">
+        {{ question.content }}
+    </div>
+    <div class="js-reponse ml-4">
+        {% if question.reponse %}
+            {% include 'blog/subtemplates/reponse.html' with reponse=question.reponse %}
+        {% elif user == question.post.author %}
+            {% include 'blog/subtemplates/reponse_form.html' with question=question %}
+        {% endif %}
+    </div>
+</article>

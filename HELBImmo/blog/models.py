@@ -58,4 +58,22 @@ class PostFavorite(models.Model):
     date = models.DateTimeField( default=timezone.now)
 
     def __str__(self):
-        return self.user.username + " favorite on " + self.post.title
+        return self.user + " favorite on " + self.post.title
+
+class Question(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    date_posted = models.DateTimeField(default=timezone.now)
+    content = models.TextField()
+
+    def __str__(self):
+        return self.user.__str__() + ' on ' + self.post.__str__() + ' : ' + self.content
+
+class Reponse(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    question = models.OneToOneField(Question, on_delete=models.CASCADE, blank=True, null=True)
+    date_posted = models.DateTimeField(default=timezone.now)
+    content = models.TextField()
+
+    def __str__(self):
+        return 'answer to ' + self.question.__str__()

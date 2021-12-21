@@ -1,5 +1,6 @@
 {% extends "blog/base.html" %}
 {% load crispy_forms_tags %}
+{% load static %}
 {% block content %}
     <div class="content-section">
         <form method="POST" enctype='multipart/form-data'>
@@ -16,4 +17,14 @@
 {% endblock content %}
 {% block scripts %}
     {{ form.media }}
+    <script>
+        let idField = '#id_type_bien';
+        let changeableFields = ['#div_id_room_amount', '#div_id_nb_etage', '#div_id_situe_etage']
+        let specificFields = {
+            'Garage': [],
+            'Appartement': ['#div_id_room_amount', '#div_id_situe_etage'],
+            'Maison': ['#div_id_room_amount', '#div_id_nb_etage']
+        }
+    </script>
+    <script src="{% static 'blog/fieldHider.js' %}"></script>
 {% endblock %}

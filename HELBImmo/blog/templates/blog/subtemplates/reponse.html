@@ -1,0 +1,18 @@
+<div class="article-metadata">
+    <img class="text-img rounded-circle mr-1" src="{{ reponse.user.profile.image.url }}">
+    {{ reponse.user }}
+    <small class="text-muted">{{ post.date_posted|date:"E d, Y" }}</small>
+    {% if user == reponse.user %}
+        <span class="js-confirm float-right" style="display: none;">
+            Êtes-vous sur ? 
+            <button class="js-del-reponse btn btn-sm btn-danger py-0" data-url="{% url 'answer-delete' reponse.id %}">Oui</button>
+            <button class="js-cancel btn btn-sm btn-secondary py-0">Annuler</button>
+        </span>
+        <span class="js-initial float-right">
+            <button class="js-open btn btn-sm btn-danger py-0">Supprimer</button>
+        </span>
+    {% endif %}
+</div>
+<div class="border rounded p-2">
+    {{ reponse.content }}
+</div>

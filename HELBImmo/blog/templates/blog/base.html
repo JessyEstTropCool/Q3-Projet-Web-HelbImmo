@@ -29,62 +29,54 @@
 <body>
     <header class="site-header">
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <div class="container">
-                <a class="navbar-brand mr-4" href="{% url 'blog-home' %}">HELBImmo</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle"
-                    aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarToggle">
-                    <div class="navbar-nav mr-auto">
-                        
+            <div class="d-flex justify-content-between w-100">
+                <a class="navbar-brand mr-1" href="{% url 'blog-home' %}">HELBImmo</a>
+                <!-- Search bar -->
+                <form id="searchform" class="d-flex dropdown" action="{% url 'search-results' %}" method="get">
+                    <input type="text" class="form-control rounded-right-0" name="q" value="{{ request.GET.q }}"
+                        placeholder="Search for keywords">
+                    <a class="btn btn-info text-light rounded-0 dropdown-toggle" href="#" role="button"
+                        id="dropdownFiltersLink" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false"></a>
+
+                    <div class="dropdown-menu border p-3 m-0 right-0" aria-labelledby="dropdownFiltersLink">
+                        <fieldset class="form-group">
+                            <legend class="border-bottom">Filtres</legend>
+
+                            <label class="mb-1">Budget</label>
+                            <div class="d-flex">
+                                <input type="number" class="form-control" name="budgetMin" value="{{ request.GET.budgetMin }}" min="0" placeholder="Minimum">
+                                <span class="h3 mx-1">-</span>
+                                <input type="number" class="form-control" name="budgetMax" value="{{ request.GET.budgetMax }}" min="0" placeholder="Maximum">
+                            </div>
+                        </fieldset>
+                        <fieldset class="form-group border-top m-0 pt-2 text-center">
+                            <input type="submit" class="btn btn-small btn-info ml-auto" value="Recherche détaillée">
+                        </fieldset>
                     </div>
-                    <!-- Navbar Right Side -->
-                    <form id="searchform" class="d-flex mr-auto dropdown" action="{% url 'search-results' %}" method="get">
-                        <input type="text" class="form-control rounded-right-0" name="q" value="{{ request.GET.q }}"
-                            placeholder="Search for keywords">
-                        <a class="btn btn-info text-light rounded-0 dropdown-toggle" href="#" role="button"
-                            id="dropdownFiltersLink" data-toggle="dropdown" aria-haspopup="true"
-                            aria-expanded="false"></a>
 
-                        <div class="dropdown-menu border p-3 m-0 right-0" aria-labelledby="dropdownFiltersLink">
-                            <fieldset class="form-group">
-                                <legend class="border-bottom">Filtres</legend>
-
-                                <label class="mb-1">Budget</label>
-                                <div class="d-flex">
-                                    <input type="number" class="form-control" name="budgetMin" value="{{ request.GET.budgetMin }}" min="0" placeholder="Minimum">
-                                    <span class="h3 mx-1">-</span>
-                                    <input type="number" class="form-control" name="budgetMax" value="{{ request.GET.budgetMax }}" min="0" placeholder="Maximum">
-                                </div>
-                            </fieldset>
-                            <fieldset class="form-group border-top m-0 pt-2 text-center">
-                                <input type="submit" class="btn btn-small btn-info ml-auto" value="Recherche détaillée">
-                            </fieldset>
-                        </div>
-
-                        <button class="btn btn-info rounded-left-0" form="searchform">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </form>
-                    <div class="navbar-nav">
-                        {% if user.is_authenticated %}
-                        <a class="nav-item nav-link" href="{% url 'user-posts' user %}">
-                            <img class="text-img rounded-circle" src="{{ user.profile.image.url }}">
-                        </a>
-                        <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
-                        {% else %}
-                        <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
-                        <a class="nav-item nav-link" href="{% url 'register' %}">Register</a>
-                        {% endif %}
-                    </div>
+                    <button class="btn btn-info rounded-left-0" form="searchform">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav flex-row">
+                    {% if user.is_authenticated %}
+                    <a class="nav-item nav-link px-1" href="{% url 'user-posts' user %}">
+                        <img class="text-img rounded-circle" src="{{ user.profile.image.url }}">
+                    </a>
+                    <a class="nav-item nav-link px-1" href="{% url 'logout' %}">Logout</a>
+                    {% else %}
+                    <a class="nav-item nav-link px-1" href="{% url 'login' %}">Login</a>
+                    <a class="nav-item nav-link px-1" href="{% url 'register' %}">Register</a>
+                    {% endif %}
                 </div>
             </div>
         </nav>
     </header>
 
     <div class="d-flex">
-        <div class="col-md-4">
+        <div class="col-4">
             <div class="sidebar content-section p-2 sticky-top">
                 <ul class="list-group d-flex flex-column justify-content-around h-100">
                     {% if user.is_authenticated %}
@@ -115,6 +107,13 @@
                             {% endif %}
                         </a>
                     </li>
+                    {% else %}
+                    <p class="text-center h5">
+                        Plus d'informations seront affichées ici, une fois que vous 
+                        <a href="{% url 'login' %}" class="text-decoration-none">
+                            vous serez connecté !
+                        </a>
+                    </p>
                     {% endif %}
                     <div class="text-center mt-2">
                         <a class="h6 text-decoration-none" href="{% url 'blog-about' %}">A propos de nous</a>

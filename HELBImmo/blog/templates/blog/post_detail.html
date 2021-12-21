@@ -39,10 +39,11 @@
             <a class="btn btn-sm btn-secondary" href="{% url 'post-update' object.id %}"><i class="bi bi-arrow-repeat"></i> Update</a>
             <a class="btn btn-sm btn-danger" href="{% url 'post-delete' object.id %}"><i class="bi bi-trash"></i> Delete</a>
         {% endif %}
+        <input id="id_type_bien" type="hidden" value="{{ object.type_bien }}">
         <ul class="pl-0 my-2">
-            <li id="info_addresse" class="d-flex">Addresse : {{ object.road_num }}, {{ object.region_city }} {{ object.country_code }}</li>
+            <li id="info_addresse" class="d-block">Addresse : {{ object.road_num }}, {{ object.region_city }} {{ object.country_code }}</li>
             <li id="info_rooms" class="d-flex justify-content-between">Nombres de pièces : <span>{{ object.room_amount }}</span></li>
-            <li id="info_surface" class="d-flex justify-content-between">Surface vivable : <span>{{ object.livable_surface }}</span></li>
+            <li id="info_surface" class="d-flex justify-content-between">Surface vivable : <span>{{ object.livable_surface }} m²</span></li>
             <li id="info_nb_etage" class="d-flex justify-content-between">Nombre d'étages : <span>{{ object.nb_etage }}</span></li>
             <li id="info_situe_etage" class="d-flex justify-content-between">Sité à l'étage : <span>{{ object.situe_etage }}</span></li>
         </ul>
@@ -51,16 +52,30 @@
         <div tabindex="1" id="js-map" data-image="{% static 'blog/marker.png' %}" latitude="{{ object.latitude }}" longitude="{{ object.longitude }}" style="height: 30vh;"></div>
     </div>
 </article>
-<article class="content-section">
-    <form method="post">
-        {% csrf_token %}
-        <h3 class="article-metadata">Une question ? Posez-là ici : </h3>
-        <textarea class="d-block resize-0 w-100 mb-2" style="height:20vh"></textarea>
-        <div class="text-right">
-            <button class="btn btn-info">Post</button>
+{% if user.is_authenticated and user != object.author %}
+    <article class="content-section">
+        <form id="question_form" method="post">
+            {% csrf_token %}
+            <h3 class="article-metadata">Une question ? Posez-là ici : </h3>
+            <input id="question_form_data" type="hidden" data-url="{% url 'question-new' %}" data-postid="{{ view.kwargs.pk }}">
+            <textarea class="d-block resize-0 w-100 mb-2" style="height:20vh"></textarea>
+            <div class="text-right">
+                <button class="btn btn-info">Poser une question</button>
+            </div>
+        </form>
+    </article>
+{% endif %}
+<div id="question_zone">
+    {% if questions %}
+        {% for question in questions %}
+            {% include 'blog/subtemplates/question.html' with question=question %}
+        {% endfor %}
+    {% else %}
+        <div id="noQuestions" class="text-center p-2 text-muted">
+            Personne n'a posé de questions...
         </div>
-    </form>
-</article>
+    {% endif %}
+</div>
 {% endblock content %}
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.9.0/build/ol.js"></script>
@@ -117,6 +132,87 @@
                 vectorLayer
             ],
             view: mapView
+        });
+    });
+</script>
+<script>
+    let idField = '#id_type_bien';
+    let changeableFields = ['#info_rooms', '#info_nb_etage', '#info_situe_etage']
+    let specificFields = {
+        'Garage': [],
+        'Appartement': ['#info_rooms', '#info_situe_etage'],
+        'Maison': ['#info_rooms', '#info_nb_etage']
+    }
+</script>
+<script src="{% static 'blog/fieldHider.js' %}"></script>
+<script>
+    $('#question_form').submit(function (e) {
+        e.preventDefault();
+        let info = $('#question_form_data');
+        $.ajax({
+            type: 'POST',
+            url: info.data('url'),
+            data: {
+                'question': $('#question_form textarea').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'postid': info.data('postid')
+            },
+            success: function(data){
+                $('#question_form textarea').val('');
+                $('#question_zone').prepend(data);    
+                $('#noQuestions').remove();
+            }
+        });
+    });
+
+    $('.js-answer').click(function () {
+        let btn = $(this)
+        $.ajax({
+            type: 'POST',
+            url: btn.data('url'),
+            data: {
+                'content': btn.siblings('.js-answer-content').val(),
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'questionid': btn.data('question')
+            },
+            success: function(data){
+                btn.closest('.js-reponse').empty().append(data)
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        $(".js-del-question").click(function () {
+            let btn = $(this);
+            $.ajax({
+                url: btn.data('url'),
+                success: function (result) 
+                {
+                    btn.closest('.js-question').remove();
+                }
+            });
+        });
+
+        $(".js-del-reponse").click(function () {
+            let btn = $(this);
+            $.ajax({
+                url: btn.data('url'),
+                success: function (result) 
+                {
+                    btn.closest('.js-reponse').empty().append(result);
+                }
+            });
+        });
+
+        $(".js-open").click(function () {
+            $(this).parent().siblings('.js-confirm').show();
+            $(this).closest('.js-initial').hide();
+        });
+
+        $(".js-cancel").click(function () {
+            $(this).parent().siblings('.js-initial').show();
+            $(this).closest('.js-confirm').hide();
         });
     });
 </script>

@@ -1,0 +1,9 @@
+<div class="js-initial text-right mt-2">
+    <button class="js-open btn btn-info">Répondre</button>
+</div>
+<div class="js-confirm text-right mt-2" style="display: none;">
+    {% csrf_token %}
+    <textarea class="js-answer-content d-block resize-0 w-100 mb-2" style="height:10vh"></textarea>
+    <button class="js-answer btn btn-info" data-url="{% url 'answer-question' %}" data-question="{{ question.id }}">Envoyer la réponse</button>
+    <button class="js-cancel btn btn-secondary">Annuler</button>
+</div>
