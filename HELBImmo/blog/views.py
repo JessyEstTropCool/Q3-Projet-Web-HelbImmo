@@ -151,6 +151,9 @@ class SearchResultsListView(PaginatedMixin, FavoritesMixin, ListView):
 
         context['user_favs'] = self.get_user_favorites()
 
+        if self.request.user.is_authenticated:
+            context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
+
         context['terms'] = self.request.GET.get('q')
         context['title'] = 'Recherche - ' + self.request.GET.get('q')
         return context
@@ -173,6 +176,9 @@ class UserPostListView(PaginatedMixin, FavoritesMixin, ListView):
 
         context['user_favs'] = self.get_user_favorites()
 
+        if self.request.user.is_authenticated:
+            context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
+
         context['author'] = User.objects.filter(username=self.kwargs.get('username')).first()
         context['title'] = self.kwargs.get('username')
         return context
@@ -193,6 +199,9 @@ class FavoritesListView(PaginatedMixin, FavoritesMixin, ListView):
         
         context['user_favs'] = self.get_user_favorites()
 
+        if self.request.user.is_authenticated:
+            context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
+
         context['title'] = 'Votre Watchlist'
 
         return context
@@ -206,6 +215,9 @@ class PostDetailView(FavoritesMixin, DetailView):
         context['user_favs'] = self.get_user_favorites()
         context['title'] = Post.objects.filter(id=self.kwargs.get('pk')).first().title
         context['questions'] = Question.objects.filter(post=self.kwargs.get('pk')).order_by('-date_posted')
+
+        if self.request.user.is_authenticated:
+            context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
 
         return context
 
@@ -246,6 +258,10 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
             dateTimeStat += datetime.timedelta(1)
             dateStat = dateTimeStat.date()
+
+        
+        if self.request.user.is_authenticated:
+            context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
 
         indivConsults['height'] += 10 - (indivConsults['height'] % 10)
         cumulConsults['height'] += 10 - (cumulConsults['height'] % 10)
