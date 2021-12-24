@@ -4,10 +4,10 @@ from PIL import Image
 from django.utils import timezone
 from blog.models import Post
 
+#used to extend user model
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     image = models.ImageField(default='default.jpg', upload_to='profile_pics')
-    #favorites = models.ManyToManyField(PostFavorite)
 
     def __str__(self):
         return f'{self.user.username} Profile'

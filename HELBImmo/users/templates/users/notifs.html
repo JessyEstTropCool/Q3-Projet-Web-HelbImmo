@@ -28,17 +28,5 @@
 </article>
 {% endblock content %}
 {% block scripts %}
-<script>
-    $(document).ready(function () {
-        $(".js-read").each(function () {
-            let info = $(this);
-            $.ajax({
-                url: info.attr('read-url'),
-                data: {
-                    'notifid': info.attr('data-notifid')
-                }
-            });
-        });
-    });
-</script>
+<script src="{% static 'users/readNotifs.js' %}"></script>
 {% endblock scripts %}

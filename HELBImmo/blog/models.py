@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from PIL import Image
 from django.urls import reverse
 
+#Post model, type_bien is used to differenciate between types of real estate
 class Post(models.Model):
     type_bien = models.CharField(max_length=20, default='Maison')
     title = models.CharField( max_length=100 )
@@ -41,10 +42,7 @@ class Post(models.Model):
 
         img.save(self.thumbnail.path)
 
-class GalleryImage(models.Model):
-    #post = models.ForeignKey(Post, on_delete=models.CASCADE, default=Post.objects.first() )
-    image = models.ImageField(default='no_photo.jpg', upload_to='gallery_images')
-
+#single consultation of a given post, created after loading it's detailed page
 class PostConsult(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     date = models.DateField( default=timezone.now)
@@ -52,6 +50,7 @@ class PostConsult(models.Model):
     def __str__(self):
         return self.post.title + " consult"
 
+#favorite of a post, used for the watchlist
 class PostFavorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
@@ -69,6 +68,7 @@ class Question(models.Model):
     def __str__(self):
         return self.user.__str__() + ' on ' + self.post.__str__() + ' : ' + self.content
 
+#answer is a different model due to it linking to the question rather than the post itself
 class Reponse(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     question = models.OneToOneField(Question, on_delete=models.CASCADE, blank=True, null=True)

@@ -14,9 +14,10 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.utils import timezone
 from users.models import Notification, Criteria
 from .models import Post, PostConsult, PostFavorite, Question, Reponse
-from .forms import PostCreateForm, GalleryForm
+from .forms import PostCreateForm
 import datetime
 
+#used because of amount per page customization, use paginate function on context to get correct pagination
 class PaginatedMixin():
     def paginate(self, context):
         data = self.get_queryset()
@@ -37,6 +38,7 @@ class PaginatedMixin():
         context['page_obj'] = page_obj
         context[self.context_object_name] = page_obj
 
+#used to get favorites of current user
 class FavoritesMixin():
     def get_user_favorites(self):
         if self.request.user.is_authenticated:
@@ -45,6 +47,7 @@ class FavoritesMixin():
         else:
             return None
 
+#while it is called add_favorite, it is also used to remove them
 def add_favorite(request):
     if request.user.is_authenticated:
         user = request.user
@@ -89,8 +92,6 @@ def delete_question(request, **kwargs):
     if request.user.is_authenticated and request.user == question.user:
         question.delete()
 
-    return JsonResponse({})
-
 def post_answer(request):
     content = request.POST.get('content')
 
@@ -109,6 +110,7 @@ def delete_answer(request, **kwargs):
 
         return render(request, 'blog/subtemplates/reponse_form.html', {'question': question})
 
+#home page
 class PostListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/home.html' # <app>/<model>_<viewtype>.html
@@ -124,6 +126,7 @@ class PostListView(PaginatedMixin, FavoritesMixin, ListView):
             context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
         return context
 
+#serach results
 class SearchResultsListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/search_results.html'
@@ -158,6 +161,7 @@ class SearchResultsListView(PaginatedMixin, FavoritesMixin, ListView):
         context['title'] = 'Recherche - ' + self.request.GET.get('q')
         return context
 
+#posts of a given user
 class UserPostListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/user_posts.html' # <app>/<model>_<viewtype>.html
@@ -183,6 +187,7 @@ class UserPostListView(PaginatedMixin, FavoritesMixin, ListView):
         context['title'] = self.kwargs.get('username')
         return context
 
+#watchlist
 class FavoritesListView(PaginatedMixin, FavoritesMixin, ListView):
     model = Post
     template_name = 'blog/favorites.html' # <app>/<model>_<viewtype>.html
@@ -206,6 +211,7 @@ class FavoritesListView(PaginatedMixin, FavoritesMixin, ListView):
 
         return context
 
+#detailed view of a post
 class PostDetailView(FavoritesMixin, DetailView):
     model = Post
 
@@ -221,11 +227,13 @@ class PostDetailView(FavoritesMixin, DetailView):
 
         return context
 
+#statistics of a given post only accessible to author
 class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = Post
     template_name = 'blog/post_stats.html'
     context_object_name = 'post'
 
+    #Warning : gives runtime errors due to the use of basic datetimes, needs to be converted to timezone info
     def get_context_data(self, **kwargs):
         context = super(PostStatsView, self).get_context_data(**kwargs)
 
@@ -233,6 +241,13 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         dateStat = dateTimeStat.date()
 
         post = Post.objects.filter(pk=self.kwargs.get('pk')).first()
+
+        #the structure of any graph should look like this
+        #{ 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
+        #with data being an ordered dictionnary of the data to be displayed using keys representing the x axis
+        #height being the maximum value of the graph, overflow will happen if it is smaller than anything in data
+        #and start and end being the values at the bottom
+
         indivConsults = { 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
         cumulConsults = { 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
         indivFavs = { 'data': {}, 'height': 0, 'start': dateStat, 'end': datetime.date.today() }
@@ -259,10 +274,6 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
             dateTimeStat += datetime.timedelta(1)
             dateStat = dateTimeStat.date()
 
-        
-        if self.request.user.is_authenticated:
-            context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
-
         indivConsults['height'] += 10 - (indivConsults['height'] % 10)
         cumulConsults['height'] += 10 - (cumulConsults['height'] % 10)
         indivFavs['height'] += 10 - (indivFavs['height'] % 10)
@@ -276,8 +287,7 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context['cumulConsults'] = cumulConsults
         context['indivFavs'] = indivFavs
         context['cumulFavs'] = cumulFavs
-
-        #yo = 0 / 0
+        context['notif_count'] = Notification.objects.filter(user=self.request.user, read=False).count()
 
         return context
 
@@ -290,7 +300,6 @@ class PostStatsView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostCreateForm
-    gallery_form_class = GalleryForm
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -307,12 +316,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
                 notif.save()
 
         return response
-
-    """def post(self, request, *args, **kwargs):
-        main_form = self.form_class(request.POST)
-        gall_form = self.gallery_form_class(request.POST, prefix='gall_form')
-        print(main_form.errors)
-        return render(request, self.template_name, {'form': main_form, 'gall_form': gall_form})"""
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
@@ -347,5 +350,6 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
+#about page, needs more information
 def about(request):
     return render(request, 'blog/about.html', {'title': 'About'})

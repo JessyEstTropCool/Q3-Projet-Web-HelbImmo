@@ -2,6 +2,7 @@ from django import forms
 from django.template import loader
 from django.utils.safestring import mark_safe
 
+#My magnum opus, it's beautiful isn't it
 class MapWidget(forms.widgets.Widget):
     template_name = 'blog/widgets/map_widget.html'
 

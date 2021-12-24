@@ -146,57 +146,7 @@
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"></script>
 
-    <script>
-
-        $(document).ready(function () {
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip()
-            })
-
-            $(".js-fav").click(function () {
-                let btn = $(this);
-                let postid = $(this).data('postid');
-                console.log("fav " + postid + "!");
-                $.ajax({
-                    url: btn.attr('fav-url'),
-                    data: {
-                        'postid': postid
-                    },
-                    success: function (result) {
-                        if (result.added === true) {
-                            btn.children().first().removeClass("bi-star").addClass("bi-star-fill");
-                            btn.children().last().text("Dans les favoris");
-                        }
-                        else {
-                            btn.children().first().removeClass("bi-star-fill").addClass("bi-star");
-                            btn.children().last().text("Ajouter aux favoris");
-                        }
-                    }
-                });
-            });
-
-            $('.js-get').each(function (compt, elem) {
-                let key = elem.getAttribute('data-key');
-                let value = elem.getAttribute('data-value');
-
-                if (key != null && value != null) {
-                    let searchParams = new URLSearchParams(window.location.search);
-                    searchParams.set(key, value);
-
-                    elem.setAttribute('href', '?' + searchParams);
-                }
-            });
-
-            $('#searchform').submit(function () {
-                $(this)
-                    .find('input[name]')
-                    .filter(function () {
-                        return !this.value && this.name != "q";
-                    })
-                    .prop('name', '');
-            });
-        });
-    </script>
+    <script src="{% static 'blog/baseScript.js' %}"></script>
     {% block scripts %}{% endblock %}
 </body>
 

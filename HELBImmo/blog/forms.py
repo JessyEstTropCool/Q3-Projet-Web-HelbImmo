@@ -1,9 +1,9 @@
 from django import forms
 from django.db.models import fields
-from django.core.exceptions import ValidationError
-from .models import Post, GalleryImage, PostConsult
+from .models import Post
 from .widgets import MapWidget
 
+#used by both update and create view
 class PostCreateForm(forms.ModelForm):
     class Meta:
         model = Post
@@ -24,6 +24,7 @@ class PostCreateForm(forms.ModelForm):
         'situe_etage',
         'thumbnail'
         ]
+        #this is to make the mapwidget widget in address field work
         widgets = {
             'road_num': forms.HiddenInput(), 
             'region_city': forms.HiddenInput(), 
@@ -61,6 +62,7 @@ class PostCreateForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
+    #convert data in address to be usable by the model
     def clean(self):
         addr = self.cleaned_data['address']
 
@@ -80,12 +82,3 @@ class PostCreateForm(forms.ModelForm):
             return addr
         else:
             return None
-
-    """def save(self, *args, **kwargs):
-        self.instance.save()
-        return self.instance"""
-
-class GalleryForm(forms.ModelForm):
-    class Meta:
-        model = GalleryImage
-        fields = ['image']
