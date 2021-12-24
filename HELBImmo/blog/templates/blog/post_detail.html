@@ -58,7 +58,7 @@
             {% csrf_token %}
             <h3 class="article-metadata">Une question ? Posez-là ici : </h3>
             <input id="question_form_data" type="hidden" data-url="{% url 'question-new' %}" data-postid="{{ view.kwargs.pk }}">
-            <textarea class="d-block resize-0 w-100 mb-2" style="height:20vh"></textarea>
+            <textarea class="d-block resize-0 w-100 mb-2" style="height:5rem"></textarea>
             <div class="text-right">
                 <button class="btn btn-info">Poser une question</button>
             </div>
