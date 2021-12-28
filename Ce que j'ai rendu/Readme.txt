@@ -1,0 +1,1 @@
+Si vous voulez vous amuser avec les comptes tout les mots de passe sont "helbimmo" en minuscule, et l'administrateur est "BoredDrawer"
